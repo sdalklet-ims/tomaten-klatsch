@@ -100,8 +100,14 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .bar .l{justify-self:start;display:flex;align-items:center;gap:10px}
 .bar .r{justify-self:end;display:flex;align-items:center;gap:10px;font-weight:800;font-size:clamp(18px,2.4vw,26px);color:var(--muted)}
 .field{position:relative;flex:1 1 auto;touch-action:none;z-index:1}
-.duel .field::after{content:"";position:absolute;left:8%;right:8%;top:50%;height:2px;margin-top:-1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent)}
+/* Duell: eigenes Feld pro Spieler, blau (unten) und pink (oben) eingefärbt */
+.half{position:absolute;left:0;right:0;height:50%;pointer-events:none}
+.half.p2{top:0;background:linear-gradient(to bottom,rgba(255,122,192,.05),rgba(255,122,192,.2));
+  box-shadow:inset 0 -3px 0 rgba(255,122,192,.55)}
+.half.p1{bottom:0;background:linear-gradient(to top,rgba(62,224,255,.05),rgba(62,224,255,.2));
+  box-shadow:inset 0 3px 0 rgba(62,224,255,.55)}
+.duel .field::after{content:"";position:absolute;left:0;right:0;top:50%;height:16px;margin-top:-8px;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(255,122,192,0),rgba(255,255,255,.28) 50%,rgba(62,224,255,0))}
 #tlayer{position:absolute;inset:0;pointer-events:none;z-index:4}
 .tomato{position:absolute;left:0;top:0;will-change:transform,opacity}
 .tomato svg{position:relative;width:100%;height:100%;overflow:visible;display:block}
@@ -625,19 +631,13 @@ const Art = (() => {
     return `<g class="calyx"><path d="${s}" fill="url(#calg${sfx})" stroke="#1f5e26" stroke-width="1.2" stroke-linejoin="round"/>
       <path d="M${cx} ${cy + 1}Q${cx + 1} ${cy - 8} ${cx + 5} ${cy - 12}" fill="none" stroke="#3f7d2a" stroke-width="4.2" stroke-linecap="round"/></g>`;
   }
-  function numbers(value, dual) {
-    const len = String(value).length;
-    if (!dual) {
-      const fs = len >= 3 ? 33 : 42;
-      return `<text class="num" x="50" y="62" dy=".35em" text-anchor="middle" font-size="${fs}">${value}</text>`;
-    }
-    const fs = len >= 3 ? 22 : 28;
-    return `<text class="num" x="50" y="73" dy=".35em" text-anchor="middle" font-size="${fs}">${value}</text>
-      <g transform="rotate(180 50 57)"><text class="num" x="50" y="73" dy=".35em" text-anchor="middle" font-size="${fs}">${value}</text></g>`;
+  function numberText(value) {
+    const fs = String(value).length >= 3 ? 33 : 42;
+    return `<text class="num" x="50" y="62" dy=".35em" text-anchor="middle" font-size="${fs}">${value}</text>`;
   }
   // feste Flecken für faule Tomate (deterministisch)
   const SPOTS = [[38, 50, 6], [62, 62, 7.5], [47, 78, 5], [70, 44, 4], [30, 68, 4.5], [56, 40, 3.2]];
-  function tomatoSVG(v, value, { dual = false, sfx = '', withDefs = false } = {}) {
+  function tomatoSVG(v, value, { sfx = '', withDefs = false } = {}) {
     const d = PATHS[v.id];
     let s = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">`;
     if (withDefs) s += `<defs>${commonDefs(sfx)}${gradDefs(v, sfx)}</defs>`;
@@ -659,7 +659,7 @@ const Art = (() => {
       <g clip-path="url(#tc-${v.id}${sfx})">${SPOTS.map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * .8}" fill="#2c2410" opacity=".7"/>`).join('')}
       <path d="M26 46 q8 6 2 14 M70 70 q-6 4 -2 12 M58 30 q4 6 -2 10" stroke="#2c2410" stroke-width="1.6" fill="none" opacity=".6"/></g></g>`;
     s += calyx(v, sfx);
-    if (value != null) s += numbers(value, dual);
+    if (value != null) s += numberText(value);
     return s + `</svg>`;
   }
   function basketSVG(band) {
@@ -773,7 +773,9 @@ const Game = (() => {
         <div class="bar"><div class="l"></div>${basketHTML('solo', '#ffd54a', 0)}<div class="r"></div></div>`;
     } else {
       const half = (p, color) => `<div class="l">${basketHTML('p' + (p + 1), color, p)}</div>${taskHTML(false)}<div class="r">Runde&nbsp;<span class="rnd">1</span>/${DUEL_ROUNDS}</div>`;
-      scr.innerHTML = `<div class="bar top">${half(1, '#ff7ac0')}</div><div class="field"></div><div class="bar">${half(0, '#3ee0ff')}</div>`;
+      scr.innerHTML = `<div class="bar top">${half(1, '#ff7ac0')}</div>
+        <div class="field"><div class="half p2"></div><div class="half p1"></div></div>
+        <div class="bar">${half(0, '#3ee0ff')}</div>`;
     }
     scr.insertAdjacentHTML('beforeend', `<div id="tlayer"></div><button class="btn-exit" data-action="quit" aria-label="Spiel beenden">✕</button><div class="overlay" id="cdl"></div>`);
     const field = scr.querySelector('.field');
@@ -793,55 +795,53 @@ const Game = (() => {
     g.F.mid = g.F.y + g.F.h / 2;
     setupRings();
   }
-  function cells() {
-    const F = g.F, duel = g.mode === 'duel', aspect = F.w / F.h;
-    const rows = aspect >= 1.15 ? 2 : aspect >= .75 ? (duel ? 2 : 3) : 4;
-    const cols = Math.ceil(8 / rows);
-    const padX = duel ? 70 : 14, padY = 10;
-    const cw = (F.w - 2 * padX) / cols, ch = (F.h - 2 * padY) / rows;
+  /** Solo: Raster über das ganze Feld. Duell: Raster nur für die untere Hälfte (Spieler 1);
+      die obere Hälfte (Spieler 2) bekommt dasselbe Feld um 180° gedreht – exakt gleiche Bedingungen. */
+  function cells(n) {
+    const F = g.F, duel = g.mode === 'duel';
+    const H = duel ? F.h / 2 : F.h, aspect = F.w / H;
+    let rows, cols;
+    if (duel) { rows = aspect >= 2.2 ? 1 : 2; cols = Math.ceil(n / rows); }
+    else { rows = aspect >= 1.15 ? 2 : aspect >= .75 ? 3 : 4; cols = Math.ceil(8 / rows); }
+    const padX = duel ? 70 : 14, padY = duel ? 8 : 10, y0 = duel ? F.h / 2 : 0;
+    const cw = (F.w - 2 * padX) / cols, ch = (H - 2 * padY) / rows;
     const size = Util.clamp(Math.min(cw, ch) * .84, 60, 190);
     const list = [];
     for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
-      list.push({ r, c, top: r < rows / 2, fx: (padX + cw * (c + .5)) / F.w, fy: (padY + ch * (r + .5)) / F.h });
+      list.push({ fx: (padX + cw * (c + .5)) / F.w, fy: (y0 + padY + ch * (r + .5)) / F.h });
     return { list, size, jx: Math.max(0, (cw - size) / 2 - 6) / F.w, jy: Math.max(0, (ch - size) / 2 - 6) / F.h };
   }
-  /** Duell: Platz der richtigen Tomate je 10× in oberer / unterer Hälfte, gemischt. */
-  const halfSequence = () => Logic.shuffle(Array.from({ length: DUEL_ROUNDS }, (_, i) => i % 2 === 0));
 
   function spawn(round) {
-    const { list, size, jx, jy } = cells();
     const n = round.values.length;
-    let chosen, correctCell;
-    if (g.mode === 'duel') {
-      const top = Logic.shuffle(list.filter(c => c.top)), bot = Logic.shuffle(list.filter(c => !c.top));
-      chosen = [...top.slice(0, n / 2), ...bot.slice(0, n / 2)];
-      correctCell = g.halfSeq[(g.round - 1) % DUEL_ROUNDS] ? chosen[0] : chosen[n / 2];
-    } else {
-      chosen = Logic.shuffle(list).slice(0, n);
-      correctCell = chosen[0];
-    }
-    const others = Logic.shuffle(chosen.filter(c => c !== correctCell));
-    const wrongVals = round.values.filter(v => v !== round.answer);
+    const { list, size, jx, jy } = cells(n);
+    const chosen = Logic.shuffle(list).slice(0, n);
+    const values = Logic.shuffle(round.values);
     const vars = Logic.shuffle(Art.VARIETIES);
     const order = Logic.shuffle([...Array(n).keys()]); // Stagger-Reihenfolge
-    const amp = Math.min(10, size * .07);
-    const make = (value, correct, cell, i) => {
-      const v = vars[i % vars.length];
-      const el = Util.el('div', 'tomato');
-      el.style.width = el.style.height = size + 'px';
-      el.style.opacity = '0';
-      const glow = Util.el('div', 'glow');
-      glow.style.background = `radial-gradient(circle,${v.c[1]}b0 0%,${v.c[1]}00 62%)`;
-      el.appendChild(glow);
-      el.insertAdjacentHTML('beforeend', Art.tomatoSVG(v, value, { dual: g.mode === 'duel' }));
-      g.dom.tlayer.appendChild(el);
-      return { el, glow, faul: el.querySelector('.faul'), value, correct, size, amp, idx: i,
+    const sides = g.mode === 'duel' ? [0, 1] : [0];
+    chosen.forEach((cell, i) => {
+      const base = { value: values[i], correct: values[i] === round.answer, variety: vars[i % vars.length],
+        size, amp: Math.min(10, size * .07), idx: i, delay: order[i] * 75,
         fx: cell.fx + Util.rand(-jx, jx), fy: cell.fy + Util.rand(-jy, jy),
-        ph: Util.rand(0, 6.28), f1: Util.rand(.6, 1.1), f2: Util.rand(.5, .95), f3: Util.rand(.35, .75),
-        state: 'pop', t0: performance.now(), delay: order[i] * 75, cx: 0, cy: 0, owner: -1 };
-    };
-    g.tomatoes.push(make(round.answer, true, correctCell, 0));
-    others.forEach((cell, i) => g.tomatoes.push(make(wrongVals[i], false, cell, i + 1)));
+        ph: Util.rand(0, 6.28), f1: Util.rand(.6, 1.1), f2: Util.rand(.5, .95), f3: Util.rand(.35, .75) };
+      for (const side of sides) g.tomatoes.push(makeTomato(base, side));
+    });
+  }
+  /** side 0 = unten / Solo, side 1 = oben (Duell): Position und Bewegung punktgespiegelt, um 180° gedreht. */
+  function makeTomato(b, side) {
+    const v = b.variety, el = Util.el('div', 'tomato');
+    el.style.width = el.style.height = b.size + 'px';
+    el.style.opacity = '0';
+    const glow = Util.el('div', 'glow');
+    glow.style.background = `radial-gradient(circle,${v.c[1]}b0 0%,${v.c[1]}00 62%)`;
+    el.appendChild(glow);
+    el.insertAdjacentHTML('beforeend', Art.tomatoSVG(v, b.value));
+    g.dom.tlayer.appendChild(el);
+    const t = Object.assign({}, b, { el, glow, faul: el.querySelector('.faul'), side, mir: 1, base: 0,
+      state: 'pop', t0: performance.now(), cx: 0, cy: 0, owner: -1 });
+    if (side === 1) Object.assign(t, { fx: 1 - b.fx, fy: 1 - b.fy, mir: -1, base: 180 });
+    return t;
   }
 
   /* ----- Aufgabe & Ring ----- */
@@ -877,7 +877,7 @@ const Game = (() => {
     const dom = buildDOM(mode);
     g = { id: gid, mode, dom, round: 0, tomatoes: [], task: null, accepting: false, running: false, over: false, paused: false,
       players: [{ score: 0, shown: 0, wrong: 0, log: [] }, { score: 0, shown: 0, wrong: 0, log: [] }],
-      halfSeq: halfSequence(), endAt: 0, lastTick: 99 };
+      endAt: 0, lastTick: 99 };
     measure();
     Pwa.wake(true);
     countdown(() => {
@@ -905,7 +905,7 @@ const Game = (() => {
     if (!g.running) return;
     if (g.mode === 'duel' && g.round >= DUEL_ROUNDS) return finish();
     g.round++;
-    const r = Logic.makeRound(Math.random, { count: g.mode === 'duel' ? (Math.random() < .5 ? 6 : 8) : 0, last: g.task });
+    const r = Logic.makeRound(Math.random, { count: g.mode === 'duel' ? 6 : 0, last: g.task });
     g.task = r;
     showTask(r);
     spawn(r);
@@ -917,7 +917,7 @@ const Game = (() => {
       if (t.state === 'pop' && now - t.t0 < t.delay) { t.dead = true; continue; }
       if (t.state === 'pop' || t.state === 'idle') {
         t.state = 'leave'; t.t0 = now;
-        t.leaveDir = g.mode === 'duel' ? (t.cy < g.F.mid ? 1 : -1) : 1;
+        t.leaveDir = t.mir;
       }
     }
   }
@@ -956,16 +956,17 @@ const Game = (() => {
     e.preventDefault();
     if (!g || g.over || g.paused || !g.running) return;
     const now = performance.now(), x = e.clientX, y = e.clientY;
+    // Duell: Spieler nach Spielfeldhälfte (unten = Spieler 1, oben = Spieler 2);
+    // jeder kann nur die Tomaten in seinem eigenen Feld pflücken.
+    const player = g.mode === 'duel' && y < g.F.mid ? 1 : 0;
     let best = null, bd = Infinity;
     for (const t of g.tomatoes) {
       const visible = t.state === 'idle' || (t.state === 'pop' && now - t.t0 > t.delay + 100);
-      if (!visible) continue;
+      if (!visible || t.side !== player) continue;
       const d = Math.hypot(x - t.cx, y - t.cy);
       if (d < t.size * .52 && d < bd) { best = t; bd = d; }
     }
     if (!best) return;
-    // Duell: Spieler nach Spielfeldhälfte (unten = Spieler 1, oben = Spieler 2)
-    const player = g.mode === 'duel' && y < g.F.mid ? 1 : 0;
     if (best.correct) { if (g.accepting) hitCorrect(best, player, now); }
     else hitWrong(best, player, now);
   }
@@ -982,7 +983,7 @@ const Game = (() => {
       if (o.state === 'pop' && now - o.t0 < o.delay) { o.dead = true; continue; }
       if (o.state === 'pop' || o.state === 'idle') {
         o.state = 'leave'; o.t0 = now + 180;
-        o.leaveDir = g.mode === 'duel' ? (o.cy < g.F.mid ? 1 : -1) : 1;
+        o.leaveDir = o.mir;
       }
     }
     if (g.mode === 'duel' || performance.now() < g.endAt) later(nextRound, NEXT_DELAY);
@@ -993,7 +994,7 @@ const Game = (() => {
     P.wrong++; P.log.push({ a: r.a, b: r.b, correct: false, ms: now - g.roundT0, value: t.value });
     Stats.record(r.a, r.b, false, 0);
     t.state = 'rot'; t.t0 = now;
-    t.fallDir = g.mode === 'duel' && player === 1 ? -1 : 1;   // fällt "nach unten" aus Sicht des Spielers
+    t.fallDir = t.mir;   // fällt "nach unten" aus Sicht des Spielers
     t.spin = Math.random() < .5 ? -1 : 1;
     Sound.splat();
     FX.shake(g.dom.tlayer);
@@ -1015,15 +1016,16 @@ const Game = (() => {
     for (const t of g.tomatoes) {
       if (t.dead) continue;
       const s = (now - t.t0) / 1000, amp = rm ? t.amp * .25 : t.amp;
-      let x = F.x + t.fx * F.w + Math.sin(T * t.f1 + t.ph) * amp;
-      let y = F.y + t.fy * F.h + Math.cos(T * t.f2 + t.ph * 1.3) * amp * .8;
-      let rot = rm ? 0 : Math.sin(T * t.f3 + t.ph) * 7, sx = 1, sy = 1, op = 1;
+      // t.mir = -1 / t.base = 180: Spieler-2-Feld, Schwebebewegung punktgespiegelt
+      let x = F.x + t.fx * F.w + t.mir * Math.sin(T * t.f1 + t.ph) * amp;
+      let y = F.y + t.fy * F.h + t.mir * Math.cos(T * t.f2 + t.ph * 1.3) * amp * .8;
+      let rot = t.base + (rm ? 0 : Math.sin(T * t.f3 + t.ph) * 7), sx = 1, sy = 1, op = 1;
       let glow = .45 + .2 * Math.sin(T * 2 + t.ph), extra = '';
       switch (t.state) {
         case 'pop': {
           const l = s - t.delay / 1000;
           if (l < 0) { op = 0; sx = sy = .01; break; }
-          if (!t.plopped) { t.plopped = true; if (t.idx % 2 === 0) Sound.plop(t.idx); }
+          if (!t.plopped) { t.plopped = true; if (t.side === 0 && t.idx % 2 === 0) Sound.plop(t.idx); }
           const p = Math.min(l / .5, 1), k = rm ? p : Util.easeOutBack(p);
           sx = sy = Math.max(.01, k); op = Math.min(1, l / .12);
           if (p >= 1) t.state = 'idle';
@@ -1061,11 +1063,11 @@ const Game = (() => {
           x = Util.lerp(t.x0, t.x1, e);
           y = Util.lerp(t.y0, t.y1, e) - t.dir * t.arc * 4 * e * (1 - e);
           const sc = Util.lerp(1.15, .4, e);
-          sx = sy = sc; rot = 0; glow = 1;
+          sx = sy = sc; rot = t.base; glow = 1;
           if (!rm) { // Squash & Stretch entlang der Flugrichtung
             const vx = t.x1 - t.x0, vy = (t.y1 - t.y0) - t.dir * t.arc * 4 * (1 - 2 * e);
             const ang = Math.atan2(vy, vx) * 57.3, st = 1 + .45 * Math.sin(Math.PI * p);
-            extra = `rotate(${ang.toFixed(1)}deg) scale(${(st * sc).toFixed(3)},${(sc / st).toFixed(3)}) rotate(${(-ang).toFixed(1)}deg)`;
+            extra = `rotate(${ang.toFixed(1)}deg) scale(${(st * sc).toFixed(3)},${(sc / st).toFixed(3)}) rotate(${(-ang + t.base).toFixed(1)}deg)`;
             if (Math.random() < .75) FX.spark(x + Util.rand(-8, 8), y + Util.rand(-8, 8), Math.random() < .5 ? '#ffe27a' : '#ffffff');
           }
           if (p >= 1) { t.dead = true; landed(t); }

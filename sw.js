@@ -1,6 +1,6 @@
 // Service Worker: macht Tomatenklatsch nach dem ersten Laden offline spielbar.
 // Nach jeder Änderung an index.html o. Ä. VERSION hochzählen, damit Geräte die neue Fassung holen.
-const VERSION = 'tk-v1';
+const VERSION = 'tk-v2';
 const FILES = [
   './', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png',
