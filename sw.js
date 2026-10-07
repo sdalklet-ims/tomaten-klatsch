@@ -1,6 +1,6 @@
 // Service Worker: macht Tomatenklatsch nach dem ersten Laden offline spielbar.
 // Nach jeder Änderung an index.html o. Ä. VERSION hochzählen, damit Geräte die neue Fassung holen.
-const VERSION = 'tk-v3';
+const VERSION = 'tk-v4';
 const FILES = [
   './', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png',
@@ -19,6 +19,7 @@ self.addEventListener('activate', e => {
 
 // Network-first: mit Internet immer die aktuelle Fassung (und Cache auffrischen),
 // ohne Internet oder bei langsamer Verbindung (> 3 s) aus dem Cache.
+// cache: 'no-cache' fragt beim Server nach (ETag), statt GitHubs 10-Minuten-Zwischenspeicher zu nutzen.
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
@@ -26,7 +27,7 @@ self.addEventListener('fetch', e => {
     const cache = await caches.open(VERSION);
     try {
       const res = await Promise.race([
-        fetch(req),
+        fetch(new Request(req.url, { cache: 'no-cache', credentials: 'same-origin' })),
         new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), NETWORK_TIMEOUT)),
       ]);
       if (res.ok) cache.put(req, res.clone());
