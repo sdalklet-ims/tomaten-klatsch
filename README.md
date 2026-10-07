@@ -13,7 +13,7 @@ Seite in Safari öffnen → Teilen → „Zum Home-Bildschirm“. Nach dem erste
 ## Updates
 1. Dateien ändern.
 2. In `sw.js` die Zeile `const VERSION = 'tk-v1';` hochzählen (z. B. `tk-v2`).
-3. Committen und pushen. Die iPads zeigen die neue Fassung ab dem übernächsten Start.
+3. Committen und pushen. Die iPads zeigen die neue Fassung beim nächsten Start mit Internet (ohne Internet läuft die zuletzt geladene Fassung).
 
 ## Tests
 `index.html?test` prüft die Rundenlogik (alle 100 Aufgaben, Fehlerwerte ohne Duplikate und ohne zweite richtige Lösung).

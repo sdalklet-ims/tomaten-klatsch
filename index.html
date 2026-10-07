@@ -218,10 +218,72 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .stats-foot{width:min(860px,100%);display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
 .note{font-size:14px;color:rgba(255,255,255,.55);font-weight:600;flex:1 1 260px}
 .legend{font-size:15px;color:var(--muted);font-weight:700;width:min(860px,100%)}
+/* Profile: Auswahl, Verwaltung, Editor */
+.btn:disabled{opacity:.4;pointer-events:none}
+.btn.small{font-size:clamp(16px,1.9vw,20px);min-height:48px;padding:.35em 1em}
+#scr-pick,#scr-profiles,#scr-edit{justify-content:flex-start}
+.pick-head{display:flex;align-items:center;gap:14px;width:min(1000px,100%)}
+.pick-head h2{margin:0;flex:1;font-size:clamp(28px,4vw,44px);font-weight:900}
+.pick-grid{display:flex;flex-wrap:wrap;gap:clamp(10px,1.6vw,18px);justify-content:center;max-width:1100px}
+.pcard{appearance:none;border:0;cursor:pointer;width:clamp(104px,13vw,150px);padding:10px 8px 12px;border-radius:24px;
+  background:rgba(255,255,255,.1);box-shadow:0 0 0 2px rgba(255,255,255,.2) inset;display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:transform .12s,opacity .2s;touch-action:manipulation}
+.pcard svg{width:78%;height:auto;overflow:visible}
+.pcard .nm{font-size:clamp(16px,1.9vw,21px);font-weight:800;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard.pressed{transform:scale(.94)}
+.pcard.sel{background:rgba(255,213,74,.25);box-shadow:0 0 0 4px var(--gold) inset,0 0 26px rgba(255,213,74,.5);animation:popsel .35s cubic-bezier(.3,1.6,.5,1)}
+.pick-half.p1 .pcard.sel{background:rgba(62,224,255,.22);box-shadow:0 0 0 4px var(--p1) inset,0 0 26px rgba(62,224,255,.5)}
+.pick-half.p2 .pcard.sel{background:rgba(255,122,192,.22);box-shadow:0 0 0 4px var(--p2) inset,0 0 26px rgba(255,122,192,.5)}
+@keyframes popsel{from{transform:scale(.85)}to{transform:scale(1)}}
+.pcard.taken{opacity:.25;pointer-events:none}
+.pcard.add{box-shadow:0 0 0 3px rgba(255,255,255,.35) inset;background:rgba(255,255,255,.05);justify-content:center}
+.pcard .plus{font-size:clamp(54px,7vw,72px);line-height:1;font-weight:900;color:var(--gold)}
+.hint{margin:0;font-size:clamp(17px,2.1vw,22px);color:var(--muted);font-weight:700;text-align:center;max-width:720px}
+#scr-pick.duelpick{padding:0;gap:0;justify-content:stretch}
+.pick-half{flex:1 1 0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.6vh,16px);
+  padding:10px max(76px,var(--sar)) max(10px,var(--sab)) max(76px,var(--sal))}
+.pick-half.top{transform:rotate(180deg);padding-bottom:max(10px,var(--sat))}
+.pick-half h3{margin:0;font-size:clamp(22px,3.2vh,32px);font-weight:900;text-align:center}
+.pick-half.p1 h3{color:var(--p1)} .pick-half.p2 h3{color:var(--p2)}
+.pick-half .pcard{width:clamp(92px,11vw,128px)}
+.duelpick .btn-exit{left:max(10px,var(--sal));top:50%;margin-top:-28px;font-size:30px}
+.plist{gap:10px}
+.prow{display:flex;align-items:center;gap:clamp(8px,1.4vw,14px);padding:10px 14px;border-radius:22px;background:rgba(255,255,255,.08)}
+.prow svg{width:clamp(52px,7vw,68px);height:clamp(52px,7vw,68px);flex:0 0 auto;overflow:visible}
+.prow .nm{flex:1;font-size:clamp(22px,2.8vw,30px);font-weight:900;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow .rec{color:var(--muted);font-weight:700;font-size:clamp(14px,1.8vw,18px);white-space:nowrap}
+.lbl{display:block;font-size:clamp(20px,2.6vw,28px);font-weight:800;width:min(860px,100%)}
+.pname{width:min(860px,100%);font:inherit;font-size:clamp(26px,3.4vw,36px);font-weight:800;padding:.35em .7em;border-radius:20px;border:0;
+  background:rgba(255,255,255,.94);color:#2a0b18;-webkit-user-select:text;user-select:text;outline:none;touch-action:manipulation}
+.pname:focus{box-shadow:0 0 0 4px var(--gold)}
+.fig-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(8px,1.4vw,14px);width:min(860px,100%)}
+@media (max-width:640px){.fig-grid{grid-template-columns:repeat(3,1fr)}}
+.fig{appearance:none;border:0;cursor:pointer;background:rgba(255,255,255,.08);border-radius:22px;padding:10px 6px;display:flex;flex-direction:column;
+  align-items:center;gap:4px;box-shadow:0 0 0 2px rgba(255,255,255,.15) inset;transition:transform .12s;touch-action:manipulation}
+.fig svg{width:86%;height:auto;overflow:visible;will-change:transform}
+.fig span{font-size:clamp(12px,1.4vw,15px);font-weight:800;color:var(--muted);text-align:center;line-height:1.15}
+.fig.sel{background:rgba(255,213,74,.22);box-shadow:0 0 0 4px var(--gold) inset,0 0 22px rgba(255,213,74,.45)}
+.fig.sel span{color:#fff}
+.fig.pressed{transform:scale(.94)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;width:min(860px,100%)}
+.chips:empty{display:none}
+.chip{appearance:none;border:0;cursor:pointer;display:flex;align-items:center;gap:8px;padding:5px 16px 5px 6px;border-radius:999px;
+  background:rgba(255,255,255,.1);font-weight:800;font-size:clamp(16px,2vw,20px);box-shadow:0 0 0 2px rgba(255,255,255,.2) inset;transition:transform .12s;touch-action:manipulation}
+.chip svg{width:40px;height:40px;overflow:visible}
+.chip.sel{background:rgba(255,213,74,.25);box-shadow:0 0 0 3px var(--gold) inset}
+.chip.pressed{transform:scale(.94)}
+/* Figur im Spiel und im Ergebnis */
+.who{display:flex;flex-direction:column;align-items:center}
+.who svg{width:clamp(46px,7vh,66px);height:clamp(46px,7vh,66px);overflow:visible;will-change:transform}
+.who .nm{font-size:clamp(13px,1.6vh,17px);font-weight:800;max-width:7em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.1}
+.solo-mid{display:flex;align-items:center;gap:12px}
+.res-fig svg{width:clamp(90px,15vmin,140px);height:auto;overflow:visible}
+.res-fig.winner svg,.winner .who svg{animation:winhop .7s ease-in-out infinite alternate}
+.res-half .who svg{width:clamp(56px,9vh,84px);height:clamp(56px,9vh,84px)}
 #testres{position:absolute;z-index:50;left:10px;bottom:10px;padding:8px 12px;border-radius:10px;font:14px/1.3 monospace;background:#000c}
 
 @media (prefers-reduced-motion: reduce){
-  .nebula,.pulse,.title-tomato,.task.hurry,.winner .bimg,.winner .halo{animation:none!important}
+  .nebula,.pulse,.title-tomato,.task.hurry,.winner .bimg,.winner .halo,.winner svg,.pcard.sel{animation:none!important}
   .screen{transition:opacity .2s ease,visibility 0s linear .2s;transform:none!important}
 }
 </style>
@@ -248,11 +310,15 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
       <button class="card" data-action="duel"><div class="ico" id="ico-duel"></div><b>Zu zweit</b><span>20 Runden · iPad flach hinlegen</span></button>
     </div>
     <div class="menu-row">
+      <button class="btn alt" data-action="profiles">Profile</button>
       <button class="btn alt" data-action="stats">Statistik</button>
       <button class="btn ghost" data-action="mute" id="btn-mute" aria-label="Ton an oder aus">Ton: an</button>
     </div>
   </section>
 
+  <section class="screen" id="scr-pick"></section>
+  <section class="screen" id="scr-profiles"></section>
+  <section class="screen" id="scr-edit"></section>
   <section class="screen" id="scr-game"></section>
   <section class="screen" id="scr-result"></section>
 
@@ -261,6 +327,7 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
       <button class="btn ghost" data-action="menu" aria-label="Zurück">‹ Zurück</button>
       <h2>Deine Reihen</h2>
     </div>
+    <div class="chips" id="stats-chips"></div>
     <div class="tip" id="stats-tip"></div>
     <div class="legend">Langer Balken = noch knifflig · Kurzer Balken = klappt schon gut</div>
     <div class="scroll" id="stats-list"></div>
@@ -290,6 +357,7 @@ const Util = {
   easeOutCubic: t => 1 - Math.pow(1 - t, 3),
   easeInOutQuad: t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2,
   el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; },
+  esc: s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
   reducedMotion: false,
 };
 (() => {
@@ -300,43 +368,62 @@ const Util = {
   mq.addEventListener ? mq.addEventListener('change', fn) : mq.addListener(fn);
 })();
 
-/* ---------------- Store: localStorage mit Fallback ---------------- */
+/* ---------------- Store: localStorage mit Fallback, Profile ---------------- */
 const Store = (() => {
-  const KEY = 'tomatenklatsch.v1';
-  const empty = () => ({ pairs: {}, best: 0, muted: false });
+  const KEY = 'tomatenklatsch.v2', OLD_KEY = 'tomatenklatsch.v1';
+  const MAX_PROFILES = 8;
+  // Profil: { id, name, fig, best, pairs }  ·  Gast = null (wird nicht gespeichert)
+  const empty = () => ({ profiles: [], muted: false });
   let data = empty();
+  const isObj = o => o && typeof o === 'object';
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) {
         const d = JSON.parse(raw);
-        data = Object.assign(empty(), d && typeof d === 'object' ? d : {});
-        if (!data.pairs || typeof data.pairs !== 'object') data.pairs = {};
+        data = Object.assign(empty(), isObj(d) ? d : {});
+        if (!Array.isArray(data.profiles)) data.profiles = [];
+        data.profiles = data.profiles.filter(p => isObj(p) && p.id && typeof p.name === 'string')
+          .map(p => Object.assign({ fig: 'krone', best: 0 }, p, { pairs: isObj(p.pairs) ? p.pairs : {} }));
+      } else {
+        // alte Fassung ohne Profile: nur die Ton-Einstellung übernehmen, Statistik verwerfen
+        const old = localStorage.getItem(OLD_KEY);
+        if (old) { const o = JSON.parse(old); data.muted = !!(o && o.muted); localStorage.removeItem(OLD_KEY); save(); }
       }
     } catch (e) { data = empty(); }
     return data;
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* privat / voll: still weiter */ } }
-  function reset() { const m = data.muted; data = empty(); data.muted = m; save(); }
-  return { load, save, reset, get data() { return data; } };
+  const get = id => data.profiles.find(p => p.id === id) || null;
+  function add(name, fig) {
+    if (data.profiles.length >= MAX_PROFILES) return null;
+    const p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, fig, best: 0, pairs: {} };
+    data.profiles.push(p); save(); return p;
+  }
+  function update(id, name, fig) { const p = get(id); if (p) { p.name = name; p.fig = fig; save(); } return p; }
+  function remove(id) { data.profiles = data.profiles.filter(p => p.id !== id); save(); }
+  function resetStats(id) { const p = get(id); if (p) { p.pairs = {}; p.best = 0; save(); } }
+  return { load, save, get, add, update, remove, resetStats, MAX_PROFILES,
+    get data() { return data; }, get profiles() { return data.profiles; } };
 })();
 
-/* ---------------- Stats: Erfassung pro Faktorpaar, Auswertung pro Reihe ---------------- */
+/* ---------------- Stats: Erfassung pro Faktorpaar, Auswertung pro Reihe (je Profil) ---------------- */
 const Stats = (() => {
   // pairs["7x8"] = { n: Versuche, wrong: Fehlversuche, tSum: Summe Reaktionszeit (ms, nur richtige), tN }
-  function record(a, b, correct, ms) {
-    const k = a + 'x' + b, p = Store.data.pairs;
+  function record(profile, a, b, correct, ms) {
+    if (!profile) return; // Gast: keine Statistik
+    const k = a + 'x' + b, p = profile.pairs;
     const e = p[k] || (p[k] = { n: 0, wrong: 0, tSum: 0, tN: 0 });
     e.n++;
     if (!correct) e.wrong++;
     else if (ms > 0 && ms < 60000) { e.tSum += ms; e.tN++; }
     Store.save();
   }
-  function rows() {
-    const r = [];
+  function rows(profile) {
+    const r = [], pairs = profile ? profile.pairs : {};
     for (let i = 1; i <= 10; i++) r.push({ row: i, n: 0, wrong: 0, tSum: 0, tN: 0 });
-    for (const k in Store.data.pairs) {
-      const [a, b] = k.split('x').map(Number), e = Store.data.pairs[k];
+    for (const k in pairs) {
+      const [a, b] = k.split('x').map(Number), e = pairs[k];
       if (!(a >= 1 && a <= 10 && b >= 1 && b <= 10)) continue;
       const add = i => { const x = r[i - 1]; x.n += e.n; x.wrong += e.wrong; x.tSum += e.tSum; x.tN += e.tN; };
       add(a); if (b !== a) add(b);
@@ -690,7 +777,57 @@ const Art = (() => {
       <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff8a5a" stop-opacity=".7"/><stop offset="1" stop-color="#ff8a5a" stop-opacity="0"/></radialGradient></defs>
       <rect width="512" height="512" fill="url(#sky)"/>${stars}<circle cx="256" cy="270" r="210" fill="url(#glow)"/>${tom}</svg>`;
   }
-  return { VARIETIES, installDefs, tomatoSVG, basketSVG, sliceSVG, iconSVG };
+  /* ----- Tomatenfiguren für Profile: Sorte + Gesicht + Merkmal ----- */
+  const FIGURES = [
+    { id: 'krone', name: 'Kronen-Tomate', variety: 'red' },
+    { id: 'brille', name: 'Brillen-Tomate', variety: 'yellow' },
+    { id: 'muetze', name: 'Mützen-Tomate', variety: 'orange' },
+    { id: 'schleife', name: 'Schleifen-Tomate', variety: 'pink' },
+    { id: 'musik', name: 'Musik-Tomate', variety: 'zebra' },
+    { id: 'astro', name: 'Astro-Tomate', variety: 'krim' },
+  ];
+  const GUEST_FIG = { id: 'gast', name: 'Gast', variety: 'beef' };
+  const FACE = `<g class="face">
+    <ellipse cx="31" cy="64" rx="5" ry="3.2" fill="#ff8aa6" opacity=".55"/><ellipse cx="69" cy="64" rx="5" ry="3.2" fill="#ff8aa6" opacity=".55"/>
+    <ellipse cx="39" cy="53" rx="6.5" ry="7.5" fill="#fff"/><ellipse cx="61" cy="53" rx="6.5" ry="7.5" fill="#fff"/>
+    <circle cx="40" cy="54.5" r="3.8" fill="#1b1030"/><circle cx="62" cy="54.5" r="3.8" fill="#1b1030"/>
+    <circle cx="41.5" cy="52.6" r="1.4" fill="#fff"/><circle cx="63.5" cy="52.6" r="1.4" fill="#fff"/>
+    <path d="M41 66Q50 76 59 66Q50 70 41 66Z" fill="#4a0c18" stroke="#4a0c18" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M45.5 70.4Q50 73.6 54.5 70.4Q50 71.8 45.5 70.4Z" fill="#ff7b8f"/></g>`;
+  const ACCESSORY = {
+    krone: `<path d="M31 25L33 8L41.5 17L50 4L58.5 17L67 8L69 25Z" fill="#ffd54a" stroke="#b77800" stroke-width="1.6" stroke-linejoin="round"/>
+      <rect x="30" y="21" width="40" height="6" rx="2" fill="#ffc21a" stroke="#b77800" stroke-width="1.4"/>
+      <circle cx="50" cy="13" r="2.6" fill="#ff4f7a"/><circle cx="40" cy="24" r="1.8" fill="#3ee0ff"/><circle cx="50" cy="24" r="1.8" fill="#9dff7a"/><circle cx="60" cy="24" r="1.8" fill="#3ee0ff"/>`,
+    brille: `<g fill="rgba(200,235,255,.28)" stroke="#2a2340" stroke-width="2.8"><circle cx="39" cy="53" r="10"/><circle cx="61" cy="53" r="10"/></g>
+      <path d="M49 52Q50 49.5 51 52" stroke="#2a2340" stroke-width="2.6" fill="none"/>
+      <path d="M29 51L14 47M71 51L86 47" stroke="#2a2340" stroke-width="2.6" stroke-linecap="round"/>`,
+    muetze: `<path d="M20 36Q20 8 50 8Q80 8 80 36Z" fill="#3e7bff"/>
+      <path d="M28 18Q50 8 72 18M24 27Q50 17 76 27" stroke="#7fb0ff" stroke-width="3" fill="none" opacity=".8"/>
+      <rect x="17" y="30" width="66" height="10" rx="5" fill="#e9f1ff"/>
+      <path d="M22 35H78" stroke="#b9cff5" stroke-width="2" stroke-dasharray="3 3"/>
+      <circle cx="50" cy="7" r="7" fill="#fff"/><circle cx="48" cy="5" r="2.5" fill="#e4ecff"/>`,
+    schleife: `<g transform="rotate(-18 34 22)" stroke="#c2185b" stroke-width="1.4" stroke-linejoin="round">
+      <path d="M34 22L18 12Q14 22 18 32Z" fill="#ff4f9a"/><path d="M34 22L50 12Q54 22 50 32Z" fill="#ff4f9a"/>
+      <circle cx="34" cy="22" r="4.5" fill="#ff7ab5"/></g>`,
+    musik: `<path d="M16 52Q14 10 50 9Q86 10 84 52" fill="none" stroke="#2c2c44" stroke-width="5.5" stroke-linecap="round"/>
+      <rect x="6" y="44" width="14" height="22" rx="6" fill="#ff5a6a" stroke="#2c2c44" stroke-width="2"/>
+      <rect x="80" y="44" width="14" height="22" rx="6" fill="#ff5a6a" stroke="#2c2c44" stroke-width="2"/>
+      <path d="M88 24V12L97 9V21" stroke="#ffd54a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <circle cx="86" cy="24" r="3" fill="#ffd54a"/><circle cx="95" cy="21" r="3" fill="#ffd54a"/>`,
+    astro: `<circle cx="50" cy="54" r="45" fill="rgba(170,210,255,.14)" stroke="#dfeaff" stroke-width="3"/>
+      <path d="M22 36Q30 18 50 13" stroke="#fff" stroke-width="3.5" fill="none" opacity=".7" stroke-linecap="round"/>
+      <path d="M24 91Q50 103 76 91L73 99Q50 108 27 99Z" fill="#cfd8e8" stroke="#9aa8c2" stroke-width="1.2"/>
+      <path d="M50 9V1" stroke="#dfeaff" stroke-width="2.2"/><circle cx="50" cy="0" r="3.2" fill="#ff5a6a"/>`,
+  };
+  const figure = id => FIGURES.find(f => f.id === id) || GUEST_FIG;
+  /** Figur als SVG (nutzt die globalen <defs>). id unbekannt/null → Gast-Tomate. */
+  function figureSVG(id) {
+    const f = figure(id), v = VARIETIES.find(x => x.id === f.variety);
+    let inner = tomatoSVG(v, null).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + FACE;
+    if (f.id === 'astro') inner = `<g transform="translate(50 57) scale(.78) translate(-50 -57)">${inner}</g>`;
+    return `<svg class="figsvg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}${ACCESSORY[f.id] || ''}</svg>`;
+  }
+  return { VARIETIES, FIGURES, figure, figureSVG, installDefs, tomatoSVG, basketSVG, sliceSVG, iconSVG };
 })();
 
 /* ---------------- FX: Partikel, Konfetti, Wackeln ---------------- */
@@ -764,15 +901,20 @@ const Game = (() => {
   /* ----- DOM ----- */
   const taskHTML = ring => `<div class="task">${ring ? '<svg class="ring"><path class="track"/><path class="prog"/></svg>' : ''}<div class="task-text"></div></div>`;
   const basketHTML = (cls, color, p) => `<div class="basket ${cls}" data-p="${p}"><div class="halo"></div>${Art.basketSVG(color)}<div class="score">0</div></div>`;
+  /** Figur + Name des Spielers neben dem Korb */
+  const whoHTML = (mode, p) => {
+    const prof = g.prof[p];
+    return `<div class="who" data-p="${p}">${Art.figureSVG(prof ? prof.fig : null)}<span class="nm">${Util.esc(UI.displayName(prof, p, mode))}</span></div>`;
+  };
   function buildDOM(mode) {
     scr.classList.remove('solo', 'duel'); scr.classList.add(mode);
     if (mode === 'solo') {
       scr.innerHTML = `
         <div class="bar solo-top"><div class="l"></div>${taskHTML(true)}<div class="r"><span class="timeleft">60</span>&nbsp;s</div></div>
         <div class="field"></div>
-        <div class="bar"><div class="l"></div>${basketHTML('solo', '#ffd54a', 0)}<div class="r"></div></div>`;
+        <div class="bar"><div class="l"></div><div class="solo-mid">${whoHTML(mode, 0)}${basketHTML('solo', '#ffd54a', 0)}</div><div class="r"></div></div>`;
     } else {
-      const half = (p, color) => `<div class="l">${basketHTML('p' + (p + 1), color, p)}</div>${taskHTML(false)}<div class="r">Runde&nbsp;<span class="rnd">1</span>/${DUEL_ROUNDS}</div>`;
+      const half = (p, color) => `<div class="l">${whoHTML(mode, p)}${basketHTML('p' + (p + 1), color, p)}</div>${taskHTML(false)}<div class="r">Runde&nbsp;<span class="rnd">1</span>/${DUEL_ROUNDS}</div>`;
       scr.innerHTML = `<div class="bar top">${half(1, '#ff7ac0')}</div>
         <div class="field"><div class="half p2"></div><div class="half p1"></div></div>
         <div class="bar">${half(0, '#3ee0ff')}</div>`;
@@ -870,14 +1012,16 @@ const Game = (() => {
   }
 
   /* ----- Ablauf ----- */
-  function start(mode) {
+  /** profiles: [Profil | null (Gast), …] – Index 0 = unten / Solo, 1 = oben */
+  function start(mode, profiles = []) {
     gid++;
     if (g) g.over = true;
     FX.clear();
-    const dom = buildDOM(mode);
-    g = { id: gid, mode, dom, round: 0, tomatoes: [], task: null, accepting: false, running: false, over: false, paused: false,
+    g = { id: gid, mode, round: 0, tomatoes: [], task: null, accepting: false, running: false, over: false, paused: false,
+      prof: [profiles[0] || null, profiles[1] || null],
       players: [{ score: 0, shown: 0, wrong: 0, log: [] }, { score: 0, shown: 0, wrong: 0, log: [] }],
       endAt: 0, lastTick: 99 };
+    g.dom = buildDOM(mode);
     measure();
     Pwa.wake(true);
     countdown(() => {
@@ -933,13 +1077,14 @@ const Game = (() => {
     const [p1, p2] = g.players;
     let res;
     if (g.mode === 'solo') {
-      const prev = Store.data.best || 0, newBest = p1.score > prev;
-      if (newBest) { Store.data.best = p1.score; Store.save(); }
+      const prof = g.prof[0], prev = prof ? prof.best || 0 : 0, newBest = !!prof && p1.score > prev;
+      if (newBest) { prof.best = p1.score; Store.save(); }  // Rekord nur mit Profil
       const hits = p1.log.filter(l => l.correct);
-      res = { mode: 'solo', score: p1.score, best: Math.max(prev, p1.score), newBest: newBest && p1.score > 0,
+      res = { mode: 'solo', players: g.prof, score: p1.score, best: Math.max(prev, p1.score), newBest,
         avgMs: hits.length ? hits.reduce((s, l) => s + l.ms, 0) / hits.length : 0, wrong: p1.wrong, log: p1.log };
     } else {
-      res = { mode: 'duel', scores: [p1.score, p2.score], winner: p1.score > p2.score ? 0 : p2.score > p1.score ? 1 : -1, logs: [p1.log, p2.log] };
+      res = { mode: 'duel', players: g.prof, scores: [p1.score, p2.score],
+        winner: p1.score > p2.score ? 0 : p2.score > p1.score ? 1 : -1, logs: [p1.log, p2.log] };
     }
     UI.showResult(res);
   }
@@ -975,7 +1120,7 @@ const Game = (() => {
     g.accepting = false;
     const r = g.task, ms = now - g.roundT0, P = g.players[player];
     P.score++; P.log.push({ a: r.a, b: r.b, correct: true, ms });
-    Stats.record(r.a, r.b, true, ms);
+    Stats.record(g.prof[player], r.a, r.b, true, ms);
     t.state = 'pick'; t.t0 = now; t.owner = player; t.el.style.zIndex = 10;
     Sound.pluck();
     FX.burst(t.cx, t.cy, Util.reducedMotion ? 2 : 8);
@@ -992,7 +1137,7 @@ const Game = (() => {
     if (t.state === 'rot') return;
     const r = g.task, P = g.players[player];
     P.wrong++; P.log.push({ a: r.a, b: r.b, correct: false, ms: now - g.roundT0, value: t.value });
-    Stats.record(r.a, r.b, false, 0);
+    Stats.record(g.prof[player], r.a, r.b, false, 0);
     t.state = 'rot'; t.t0 = now;
     t.fallDir = t.mir;   // fällt "nach unten" aus Sicht des Spielers
     t.spin = Math.random() < .5 ? -1 : 1;
@@ -1004,6 +1149,8 @@ const Game = (() => {
     P.shown = Math.min(P.score, P.shown + 1);
     const sc = b.querySelector('.score'); sc.textContent = P.shown;
     FX.bump(sc, 1.45); FX.hop(b.querySelector('.bimg'));
+    const who = scr.querySelector(`.who[data-p="${t.owner}"] svg`);
+    if (who) FX.hop(who);   // die Figur freut sich mit
     const br = b.querySelector('.bimg').getBoundingClientRect();
     FX.burst(br.left + br.width / 2, br.top + br.height / 2, Util.reducedMotion ? 2 : 10, '#fff7c0');
     Sound.land();
@@ -1107,23 +1254,31 @@ const Game = (() => {
 
 /* ---------------- UI: Zustandsautomat für Bildschirme ---------------- */
 const UI = (() => {
-  const S = {
-    start: document.getElementById('scr-start'), menu: document.getElementById('scr-menu'),
-    game: document.getElementById('scr-game'), result: document.getElementById('scr-result'),
-    stats: document.getElementById('scr-stats'),
-  };
+  const S = {};
+  for (const k of ['start', 'menu', 'pick', 'profiles', 'edit', 'game', 'result', 'stats']) S[k] = document.getElementById('scr-' + k);
   // erlaubte Übergänge
-  const FLOW = { start: ['menu'], menu: ['game', 'stats'], game: ['result', 'menu'], result: ['game', 'menu'], stats: ['menu'] };
-  let current = 'start', lastMode = 'solo';
+  const FLOW = {
+    start: ['menu'], menu: ['pick', 'stats', 'profiles'], pick: ['game', 'menu', 'edit'],
+    profiles: ['menu', 'edit'], edit: ['profiles', 'pick'], game: ['result', 'menu'],
+    result: ['game', 'menu'], stats: ['menu'],
+  };
+  let current = 'start';
+  let last = { mode: 'solo', players: [null, null] }; // für „Nochmal“
+  const esc = Util.esc;
   const fmtS = ms => (ms / 1000).toFixed(1).replace('.', ',');
+  /** „Gut gespielt“ → „Gut gespielt, Lena“ (Gast ohne Namen) */
+  const withName = (txt, p) => p ? `${txt}, ${esc(p.name)}` : txt;
+  const displayName = (p, i, mode) => p ? p.name : mode === 'duel' ? `Spieler ${i + 1}` : 'Gast';
 
   function go(name) {
     if (name === current) return;
     if (!FLOW[current].includes(name)) { console.warn('Ungültiger Übergang', current, '→', name); return; }
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     S[current].classList.remove('active');
     S[name].classList.add('active');
     current = name;
     if (name === 'stats') renderStats();
+    if (name === 'profiles') renderProfiles();
   }
 
   /* ----- Dialog ----- */
@@ -1157,30 +1312,143 @@ const UI = (() => {
       { label: 'Beenden', cls: 'danger', fn: () => { Game.quit(); go('menu'); } }], Game.mode === 'duel');
   }
 
+  /* ----- Profil-Karte (Figur + Name) ----- */
+  const card = (p, attrs, cls = '') =>
+    `<button class="pcard ${cls}" ${attrs}>${Art.figureSVG(p ? p.fig : null)}<span class="nm">${p ? esc(p.name) : 'Gast'}</span></button>`;
+
+  /* ----- „Wer spielt?“ ----- */
+  let pick = null; // { mode, sel: [id | 'guest' | undefined, …] }
+  function openPick(mode) { pick = { mode, sel: [] }; renderPick(); go('pick'); }
+  function renderPick() {
+    const el = S.pick, profs = Store.profiles;
+    if (pick.mode === 'solo') {
+      el.classList.remove('duelpick');
+      el.innerHTML = `<div class="pick-head"><button class="btn ghost" data-action="menu">‹ Zurück</button><h2>Wer spielt?</h2></div>
+        <div class="pick-grid">
+          ${profs.map(p => card(p, `data-action="pickp" data-id="${p.id}" data-side="0"`)).join('')}
+          ${card(null, 'data-action="pickp" data-id="guest" data-side="0"', 'guest')}
+          ${profs.length < Store.MAX_PROFILES ? '<button class="pcard add" data-action="newp" data-from="pick"><span class="plus">+</span><span class="nm">Neu</span></button>' : ''}
+        </div>
+        ${profs.length ? '' : '<p class="hint">Tipp: Mit einem eigenen Profil merkt sich das Spiel deinen Rekord und welche Reihen noch knifflig sind.</p>'}`;
+      return;
+    }
+    el.classList.add('duelpick');
+    const half = side => {
+      const mine = pick.sel[side], other = pick.sel[1 - side];
+      return `<div class="pick-half p${side + 1} ${side === 1 ? 'top' : ''}">
+        <h3>${mine ? 'Bereit! Warte auf die andere Seite …' : 'Wer sitzt hier?'}</h3>
+        <div class="pick-grid">
+          ${profs.map(p => card(p, `data-action="pickp" data-id="${p.id}" data-side="${side}"`,
+            (mine === p.id ? 'sel' : '') + (other === p.id ? ' taken' : ''))).join('')}
+          ${card(null, `data-action="pickp" data-id="guest" data-side="${side}"`, 'guest' + (mine === 'guest' ? ' sel' : ''))}
+        </div></div>`;
+    };
+    el.innerHTML = half(1) + '<div class="res-divider"></div>' + half(0) +
+      '<button class="btn-exit" data-action="menu" aria-label="Zurück zum Menü">‹</button>';
+  }
+  function pickProfile(id, side) {
+    const prof = id === 'guest' ? null : Store.get(id);
+    if (pick.mode === 'solo') return startGame('solo', [prof]);
+    if (id !== 'guest' && pick.sel[1 - side] === id) return; // jedes Profil nur einmal
+    pick.sel[side] = pick.sel[side] === id ? undefined : id; // nochmal tippen = abwählen
+    renderPick();
+    if (pick.sel[0] && pick.sel[1]) {
+      const chosen = pick.sel.slice();
+      setTimeout(() => {
+        if (current !== 'pick' || !pick || pick.sel[0] !== chosen[0] || pick.sel[1] !== chosen[1]) return;
+        startGame('duel', chosen.map(i => i === 'guest' ? null : Store.get(i)));
+      }, 800);
+    }
+  }
+
+  /* ----- Profile verwalten ----- */
+  function renderProfiles() {
+    const profs = Store.profiles;
+    S.profiles.innerHTML = `<div class="stats-head"><button class="btn ghost" data-action="menu">‹ Zurück</button><h2>Profile</h2></div>
+      <div class="scroll plist">${profs.map(p => `<div class="prow">${Art.figureSVG(p.fig)}
+          <span class="nm">${esc(p.name)}</span><span class="rec">Rekord: ${p.best}</span>
+          <button class="btn ghost small" data-action="editp" data-id="${p.id}">Ändern</button>
+          <button class="btn danger small" data-action="delp" data-id="${p.id}">Löschen</button></div>`).join('')
+        || '<p class="hint">Noch keine Profile. Leg doch für jedes Kind eins an!</p>'}</div>
+      <div class="stats-foot"><span class="note">Bis zu ${Store.MAX_PROFILES} Profile. Sie werden nur auf diesem Gerät gespeichert.</span>
+        ${profs.length < Store.MAX_PROFILES ? '<button class="btn" data-action="newp" data-from="profiles">+ Neues Profil</button>' : ''}</div>`;
+  }
+
+  /* ----- Profil anlegen / ändern ----- */
+  let edit = null; // { id, fig, from }
+  function openEditor(id, from) {
+    const p = id ? Store.get(id) : null;
+    const used = new Set(Store.profiles.map(x => x.fig));
+    edit = { id, from, fig: p ? p.fig : (Art.FIGURES.find(f => !used.has(f.id)) || Art.FIGURES[0]).id };
+    S.edit.innerHTML = `<div class="stats-head"><button class="btn ghost" data-action="cancelp">‹ Zurück</button><h2>${p ? 'Profil ändern' : 'Neues Profil'}</h2></div>
+      <label class="lbl" for="pname">Wie heißt du?</label>
+      <input id="pname" class="pname" type="text" maxlength="12" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="done" placeholder="Name">
+      <div class="lbl">Such dir deine Tomate aus:</div>
+      <div class="fig-grid">${Art.FIGURES.map(f => `<button class="fig ${f.id === edit.fig ? 'sel' : ''}" data-action="figsel" data-fig="${f.id}">${Art.figureSVG(f.id)}<span>${f.name}</span></button>`).join('')}</div>
+      <button class="btn big" data-action="savep" id="btn-save">Fertig</button>`;
+    const inp = S.edit.querySelector('#pname');
+    inp.value = p ? p.name : '';
+    inp.addEventListener('input', updateSave);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); });
+    updateSave();
+    go('edit');
+  }
+  const nameValue = () => S.edit.querySelector('#pname').value.trim().replace(/\s+/g, ' ').slice(0, 12);
+  function updateSave() { S.edit.querySelector('#btn-save').disabled = !nameValue(); }
+  function saveProfile() {
+    const name = nameValue();
+    if (!name) return;
+    if (edit.id) Store.update(edit.id, name, edit.fig); else Store.add(name, edit.fig);
+    leaveEditor();
+  }
+  function leaveEditor() {
+    const from = edit ? edit.from : 'profiles';
+    edit = null;
+    if (from === 'pick' && pick) { renderPick(); go('pick'); } else go('profiles');
+  }
+
   /* ----- Aktionen ----- */
-  function startGame(mode) {
-    lastMode = mode;
+  function startGame(mode, players) {
+    last = { mode, players };
     go('game');
-    Game.start(mode);
+    Game.start(mode, players);
   }
   const actions = {
     start() { Sound.unlock(); go('menu'); },
-    solo() { startGame('solo'); },
-    duel() { startGame('duel'); },
-    again() { startGame(lastMode); },
+    solo() { openPick('solo'); },
+    duel() { openPick('duel'); },
+    again() { startGame(last.mode, last.players.map(p => p && Store.get(p.id))); }, // gelöschtes Profil → Gast
     menu() { if (current === 'game') Game.quit(); FX.clear(); go('menu'); },
     stats() { go('stats'); },
+    profiles() { go('profiles'); },
     mute() { Store.data.muted = !Store.data.muted; Store.save(); Sound.setMuted(Store.data.muted); updateMute(); },
     quit() { pauseDialog('Spiel beenden?', 'Wenn du jetzt aufhörst, zählt diese Runde nicht.'); },
-    reset() {
-      dialog('Statistik löschen?', 'Alle gesammelten Werte werden gelöscht. Das kann man nicht rückgängig machen.', [
+    pickp(b) { pickProfile(b.dataset.id, +b.dataset.side); },
+    newp(b) { openEditor(null, b.dataset.from); },
+    editp(b) { openEditor(b.dataset.id, 'profiles'); },
+    cancelp() { leaveEditor(); },
+    savep() { saveProfile(); },
+    figsel(b) {
+      edit.fig = b.dataset.fig;
+      S.edit.querySelectorAll('.fig').forEach(f => f.classList.toggle('sel', f === b));
+      FX.hop(b.querySelector('svg'));
+    },
+    delp(b) {
+      const p = Store.get(b.dataset.id); if (!p) return;
+      dialog(`${p.name} löschen?`, `Das Profil und die Statistik von ${p.name} werden gelöscht. Das kann man nicht rückgängig machen.`, [
         { label: 'Abbrechen', cls: 'ghost' },
-        { label: 'Ja, löschen', cls: 'danger', fn: () => { Store.reset(); renderStats(); } }]);
+        { label: 'Ja, löschen', cls: 'danger', fn: () => { Store.remove(p.id); renderProfiles(); } }]);
+    },
+    statsp(b) { statsSel = b.dataset.id; renderStats(); },
+    reset() {
+      const p = Store.get(statsSel); if (!p) return;
+      dialog(`Statistik von ${p.name} löschen?`, 'Alle gesammelten Werte und der Rekord werden gelöscht. Das kann man nicht rückgängig machen.', [
+        { label: 'Abbrechen', cls: 'ghost' },
+        { label: 'Ja, löschen', cls: 'danger', fn: () => { Store.resetStats(p.id); renderStats(); } }]);
     },
   };
   function updateMute() {
-    const b = document.getElementById('btn-mute');
-    b.textContent = Store.data.muted ? 'Ton: aus' : 'Ton: an';
+    document.getElementById('btn-mute').textContent = Store.data.muted ? 'Ton: aus' : 'Ton: an';
   }
 
   /* ----- Ergebnis ----- */
@@ -1188,30 +1456,35 @@ const UI = (() => {
     const el = S.result;
     if (res.mode === 'solo') {
       el.classList.remove('duelres');
-      const n = res.score;
-      const head = n === 0 ? 'Weiter üben, du schaffst das!' : n < 8 ? 'Gut gepflückt!' : n < 15 ? 'Super gepflückt!' : 'Wow, ein echter Tomaten-Profi!';
+      const n = res.score, p = res.players[0];
+      const head = n === 0 ? withName('Weiter üben', p) + ', du schaffst das!' : n < 8 ? withName('Gut gepflückt', p) + '!'
+        : n < 15 ? withName('Super gepflückt', p) + '!' : withName('Wow, ein echter Tomaten-Profi', p) + '!';
+      const recLine = !p ? 'Als Gast gespielt. Mit eigenem Profil merkt sich das Spiel deinen Rekord.'
+        : res.newBest ? 'Neuer Rekord! 🎉' : 'Dein Rekord: ' + res.best;
       el.innerHTML = `<div class="res-solo">
         <p class="res-big">${head}</p>
-        <div class="res-count">${Art.basketSVG('#ffd54a')}<span class="cnt">0</span></div>
-        <p class="res-line ${res.newBest ? 'rec' : ''}">${res.newBest ? 'Neuer Rekord! 🎉' : 'Dein bester Wert: ' + res.best}</p>
+        <div class="res-count"><span class="res-fig ${res.newBest ? 'winner' : ''}">${Art.figureSVG(p ? p.fig : null)}</span>${Art.basketSVG('#ffd54a')}<span class="cnt">0</span></div>
+        <p class="res-line ${res.newBest ? 'rec' : ''}">${recLine}</p>
         ${res.avgMs ? `<p class="res-line">Im Schnitt ${fmtS(res.avgMs)} Sekunden pro Tomate</p>` : ''}
         <div class="menu-row"><button class="btn big" data-action="again">Nochmal</button><button class="btn ghost" data-action="menu">Zum Menü</button></div></div>`;
       const cnt = el.querySelector('.cnt'), t0 = performance.now(), dur = Math.min(1400, 200 + n * 70);
       const step = now => {
-        const p = Math.min(1, (now - t0) / dur), v = Math.round(n * Util.easeOutCubic(p));
+        const q = Math.min(1, (now - t0) / dur), v = Math.round(n * Util.easeOutCubic(q));
         if (cnt.textContent != v) { cnt.textContent = v; if (!Util.reducedMotion) FX.bump(cnt, 1.12); }
-        if (p < 1 && current === 'result') requestAnimationFrame(step);
+        if (q < 1 && current === 'result') requestAnimationFrame(step);
       };
       requestAnimationFrame(step);
     } else {
       el.classList.add('duelres');
-      const half = p => {
-        const me = res.scores[p], other = res.scores[1 - p], tie = res.winner === -1, win = res.winner === p;
-        const head = tie ? 'Unentschieden!' : win ? 'Du gewinnst! 🏆' : 'Gut gespielt!';
-        const sub = tie ? `Ihr habt beide ${me} Tomaten!` : `Spieler ${2 - p} hat ${other} Tomaten`;
-        return `<div class="res-half ${p === 1 ? 'top' : ''}">
+      const half = i => {
+        const me = res.players[i], other = res.players[1 - i];
+        const mine = res.scores[i], theirs = res.scores[1 - i], tie = res.winner === -1, win = res.winner === i;
+        const head = tie ? 'Unentschieden!' : win ? withName('Du gewinnst', me) + '! 🏆' : withName('Gut gespielt', me) + '!';
+        const sub = tie ? `Ihr habt beide ${mine} Tomaten!` : `${esc(displayName(other, 1 - i, 'duel'))} hat ${theirs} Tomaten`;
+        return `<div class="res-half ${i === 1 ? 'top' : ''}">
           <p class="head">${head}</p>
-          <div class="basket ${p ? 'p2' : 'p1'} ${win || tie ? 'winner' : ''}"><div class="halo"></div>${Art.basketSVG(p ? '#ff7ac0' : '#3ee0ff')}<div class="score">${me}</div></div>
+          <div class="basket ${i ? 'p2' : 'p1'} ${win || tie ? 'winner' : ''}"><div class="halo"></div>
+            <div class="who">${Art.figureSVG(me ? me.fig : null)}</div>${Art.basketSVG(i ? '#ff7ac0' : '#3ee0ff')}<div class="score">${mine}</div></div>
           <p class="sub">${sub}</p>
           <div class="row"><button class="btn" data-action="again">Nochmal</button><button class="btn ghost" data-action="menu">Menü</button></div></div>`;
       };
@@ -1222,23 +1495,33 @@ const UI = (() => {
     FX.confetti(res.mode === 'duel' ? 'radial' : 'rain');
   }
 
-  /* ----- Statistik ----- */
+  /* ----- Statistik (pro Profil) ----- */
+  let statsSel = null;
   function renderStats() {
-    const rows = Stats.rows();
+    const profs = Store.profiles;
+    if (!Store.get(statsSel)) {
+      const lastProf = last.players.find(p => p && Store.get(p.id));
+      statsSel = lastProf ? lastProf.id : profs[0] ? profs[0].id : null;
+    }
+    const prof = Store.get(statsSel);
+    document.getElementById('stats-chips').innerHTML = profs.map(p =>
+      `<button class="chip ${p.id === statsSel ? 'sel' : ''}" data-action="statsp" data-id="${p.id}">${Art.figureSVG(p.fig)}<span>${esc(p.name)}</span></button>`).join('');
+    document.querySelector('#scr-stats [data-action="reset"]').style.visibility = prof ? 'visible' : 'hidden';
+    const rows = Stats.rows(prof);
     const played = rows.filter(r => r.n > 0);
     const hard = rows.filter(r => r.enough && r.score >= .25).sort((a, b) => b.score - a.score).slice(0, 3);
     const hardSet = new Set(hard.map(r => r.row));
     let tip;
-    if (!rows.some(r => r.enough)) tip = 'Spiel ein paar Runden, dann zeige ich dir hier, welche Reihen noch knifflig sind.';
-    else if (!hard.length) tip = 'Super! Alle Reihen klappen schon richtig gut. 🌟';
+    if (!prof) tip = 'Lege unter „Profile“ ein Profil an. Dann zeige ich dir hier, welche Reihen noch knifflig sind.';
+    else if (!rows.some(r => r.enough)) tip = `${esc(prof.name)}, spiel ein paar Runden, dann zeige ich dir hier, welche Reihen noch knifflig sind.`;
+    else if (!hard.length) tip = `Super, ${esc(prof.name)}! Alle Reihen klappen schon richtig gut. 🌟`;
     else if (hard.length === 1) tip = `Die ${hard[0].row}er-Reihe ist noch knifflig! Übe sie ruhig noch ein bisschen.`;
     else {
       const names = hard.map(r => r.row + 'er');
       tip = `Die ${names.slice(0, -1).map(n => n + '-').join(', die ')} und die ${names[names.length - 1]}-Reihe sind noch knifflig!`;
     }
-    document.getElementById('stats-tip').innerHTML = Art.tomatoSVG(Art.VARIETIES[1], null) + `<span>${tip}</span>`;
-    const sorted = [...played].sort((a, b) => b.score - a.score || a.row - b.row)
-      .concat(rows.filter(r => r.n === 0));
+    document.getElementById('stats-tip').innerHTML = Art.figureSVG(prof ? prof.fig : null) + `<span>${tip}</span>`;
+    const sorted = [...played].sort((a, b) => b.score - a.score || a.row - b.row).concat(rows.filter(r => r.n === 0));
     const list = document.getElementById('stats-list');
     list.innerHTML = sorted.map(r => {
       const color = r.score < .25 ? '#7be05a' : r.score < .5 ? '#ffd54a' : '#ff7a3a';
@@ -1255,12 +1538,12 @@ const UI = (() => {
   function init() {
     document.addEventListener('click', e => {
       const b = e.target.closest('[data-action]');
-      if (!b || !actions[b.dataset.action]) return;
+      if (!b || b.disabled || !actions[b.dataset.action]) return;
       if (b.dataset.action !== 'start') Sound.tap();
       actions[b.dataset.action](b);
     });
     // Press-Feedback (zuverlässiger als :active auf iOS)
-    const PRESS = '.btn,.card,.btn-exit';
+    const PRESS = '.btn,.card,.btn-exit,.pcard,.fig,.chip';
     document.addEventListener('pointerdown', e => { const b = e.target.closest(PRESS); if (b) b.classList.add('pressed'); });
     const release = () => document.querySelectorAll('.pressed').forEach(b => b.classList.remove('pressed'));
     ['pointerup', 'pointercancel'].forEach(t => document.addEventListener(t, release));
@@ -1270,7 +1553,7 @@ const UI = (() => {
     });
     updateMute();
   }
-  return { init, go, showResult, get current() { return current; } };
+  return { init, go, showResult, displayName, get current() { return current; } };
 })();
 
 /* ---------------- Pwa: Icon, Manifest, Wake Lock, Gesten ---------------- */
