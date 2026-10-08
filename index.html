@@ -17,7 +17,7 @@
 :root{
   --deep:#0b0626; --violet:#2a0f5c; --blue:#14266e; --night-green:#0a3a37;
   --ink:#fff; --muted:rgba(255,255,255,.74);
-  --p1:#3ee0ff; --p2:#ff7ac0; --gold:#ffd54a; --hurry:#ff6a3d;
+  --p1:#3ee0ff; --p2:#ff7ac0; --p3:#9dff7a; --p4:#ffb347; --gold:#ffd54a; --hurry:#ff6a3d;
   --bar-h:clamp(84px,15vh,128px);
   --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
   --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
@@ -78,13 +78,17 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 /* ---------- Menü ---------- */
 .menu-title{margin:0;font-size:clamp(28px,4.4vw,48px);font-weight:900;text-align:center;text-shadow:0 0 18px rgba(170,120,255,.6)}
 .mode-cards{display:flex;gap:clamp(16px,3vw,36px);flex-wrap:wrap;justify-content:center}
-.card{appearance:none;border:0;cursor:pointer;width:clamp(220px,32vw,330px);padding:22px 18px 24px;border-radius:32px;
+.card{appearance:none;border:0;cursor:pointer;width:clamp(170px,21vw,260px);padding:22px 18px 24px;border-radius:32px;
   background:linear-gradient(160deg,rgba(255,255,255,.18),rgba(255,255,255,.06));
   box-shadow:0 0 0 3px rgba(255,255,255,.22) inset,0 18px 40px rgba(0,0,0,.35);
   display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .12s ease;touch-action:manipulation}
 .card.pressed{transform:scale(.95)}
 .card .ico{height:clamp(90px,15vmin,140px);display:flex;gap:4px;align-items:flex-end}
 .card .ico svg{height:100%;width:auto}
+.card .ico.many{align-items:center;justify-content:center;width:100%}
+.card .ico.many svg{width:30%;height:auto;max-height:70%;flex:0 1 auto}
+.card .ico.many svg+svg{margin-left:-6%}
+@media (orientation:portrait){.card{width:clamp(200px,40vw,330px)}}
 .card b{font-size:clamp(28px,3.6vw,40px);font-weight:900}
 .card span{font-size:clamp(17px,2vw,22px);color:var(--muted);font-weight:700}
 .menu-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center}
@@ -100,14 +104,24 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .bar .l{justify-self:start;display:flex;align-items:center;gap:10px}
 .bar .r{justify-self:end;display:flex;align-items:center;gap:10px;font-weight:800;font-size:clamp(18px,2.4vw,26px);color:var(--muted)}
 .field{position:relative;flex:1 1 auto;touch-action:none;z-index:1}
-/* Duell: eigenes Feld pro Spieler, blau (unten) und pink (oben) eingefärbt */
-.half{position:absolute;left:0;right:0;height:50%;pointer-events:none}
-.half.p2{top:0;background:linear-gradient(to bottom,rgba(255,122,192,.05),rgba(255,122,192,.2));
-  box-shadow:inset 0 -3px 0 rgba(255,122,192,.55)}
-.half.p1{bottom:0;background:linear-gradient(to top,rgba(62,224,255,.05),rgba(62,224,255,.2));
-  box-shadow:inset 0 3px 0 rgba(62,224,255,.55)}
+/* Mehrspieler: eigenes Feld (Zone) pro Spieler in Spielerfarbe; Farben/Position kommen inline aus Game.SLOTS */
+.zone{position:absolute;pointer-events:none;border-radius:14px}
 .duel .field::after{content:"";position:absolute;left:0;right:0;top:50%;height:16px;margin-top:-8px;pointer-events:none;
   background:linear-gradient(to bottom,rgba(255,122,192,0),rgba(255,255,255,.28) 50%,rgba(62,224,255,0))}
+/* Leisten bei 2–4 Spielern: ein Abschnitt pro Spieler über seinem Feld */
+.bar.multi{display:flex;justify-content:center;gap:0}
+.seg{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;height:100%;min-width:0;padding:0 6px}
+.seg.compact{grid-template-columns:auto minmax(0,1fr);gap:8px}
+.seg.compact .r{display:none}
+.seg.compact .l{gap:6px}
+.seg.compact .who svg{width:clamp(34px,5.4vh,50px);height:clamp(34px,5.4vh,50px)}
+.seg.compact .who .nm{max-width:4.6em;font-size:clamp(11px,1.4vh,14px)}
+.seg.compact .basket .bimg{width:clamp(48px,7.4vh,70px);height:clamp(38px,5.8vh,56px)}
+.seg.compact .basket .score{font-size:clamp(26px,4.4vh,42px);min-width:1.1em}
+.seg.compact .basket .halo{display:none}
+.seg.compact .task{min-width:0;padding:4px 12px;flex-direction:column;justify-self:center}
+.seg.compact .task-text{font-size:clamp(24px,4.4vh,42px)}
+.task-sub{font-size:clamp(11px,1.5vh,14px);font-weight:800;color:var(--muted);margin-top:2px;white-space:nowrap}
 #tlayer{position:absolute;inset:0;pointer-events:none;z-index:4}
 .tomato{position:absolute;left:0;top:0;will-change:transform,opacity}
 .tomato svg{position:relative;width:100%;height:100%;overflow:visible;display:block}
@@ -126,7 +140,7 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
   text-shadow:0 0 14px rgba(255,220,120,.85),0 0 32px rgba(255,140,60,.55),0 3px 0 rgba(60,10,40,.8)}
 .task-text .op{color:var(--gold);margin:0 .14em}
 .task-text .q{color:var(--gold)}
-.duel .task{background:rgba(20,8,50,.55);border-radius:999px;box-shadow:0 0 0 3px rgba(255,255,255,.15) inset}
+.multi .task{background:rgba(20,8,50,.55);border-radius:999px;box-shadow:0 0 0 3px rgba(255,255,255,.15) inset}
 
 /* Korb */
 .basket{position:relative;display:flex;align-items:center;gap:10px}
@@ -134,6 +148,9 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .basket .score{font-size:clamp(36px,6vh,60px);font-weight:900;min-width:1.4em;text-align:left;will-change:transform;
   text-shadow:0 0 16px currentColor,0 3px 0 rgba(40,10,40,.8)}
 .basket.p1 .score{color:var(--p1)} .basket.p2 .score{color:var(--p2)} .basket.solo .score{color:var(--gold)}
+.basket.p3 .score{color:var(--p3)} .basket.p4 .score{color:var(--p4)}
+.basket.p3 .halo{background:radial-gradient(circle,var(--p3),transparent 65%)}
+.basket.p4 .halo{background:radial-gradient(circle,var(--p4),transparent 65%)}
 .basket .halo{position:absolute;left:-14px;top:50%;width:calc(clamp(70px,11vh,104px) + 28px);height:calc(clamp(70px,11vh,104px) + 28px);
   margin-top:calc((clamp(70px,11vh,104px) + 28px)/-2);border-radius:50%;opacity:.35;pointer-events:none}
 .basket.p1 .halo{background:radial-gradient(circle,var(--p1),transparent 65%)}
@@ -148,14 +165,15 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
   display:flex;align-items:center;justify-content:center;transition:transform .12s;touch-action:manipulation}
 .btn-exit.pressed{transform:scale(.9)}
 .solo .btn-exit{left:max(14px,var(--sal));top:calc(var(--sat) + (var(--bar-h) - 56px)/2)}
-.duel .btn-exit{left:max(10px,var(--sal));top:50%;margin-top:-28px}
+.multi .btn-exit{left:max(10px,var(--sal));top:50%;margin-top:-28px}
+/* Countdown pro Spielerplatz (Position/Drehung inline) */
+.cdm{position:absolute;font-size:clamp(90px,22vmin,200px);font-weight:900;color:#fff;line-height:1;pointer-events:none;
+  text-shadow:0 0 30px rgba(255,210,90,.9),0 6px 0 rgba(60,10,40,.8)}
+.cdm span{display:inline-block}
+.cdm.small{font-size:clamp(60px,13vmin,130px)}
 
 /* Overlays */
 .overlay{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.cd{position:absolute;left:0;right:0;display:flex;justify-content:center;font-size:clamp(90px,22vmin,200px);font-weight:900;
-  color:#fff;text-shadow:0 0 30px rgba(255,210,90,.9),0 6px 0 rgba(60,10,40,.8)}
-.cd.solo{top:50%;transform:translateY(-50%)}
-.cd.bottom{top:52%} .cd.top{bottom:52%;transform:rotate(180deg)}
 .modal{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;
   background:rgba(8,3,26,.6);opacity:0;pointer-events:none;transition:opacity .25s}
 .modal.open{opacity:1;pointer-events:auto}
@@ -188,6 +206,12 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .res-half .basket .bimg{width:clamp(80px,13vh,120px);height:clamp(64px,10vh,96px)}
 .res-half .sub{font-size:clamp(17px,2.4vh,22px);font-weight:800;color:var(--muted);margin:0}
 .res-half .row{display:flex;gap:14px}
+.res-panels{display:flex;justify-content:center;width:100%}
+.res-panel{display:flex;flex-direction:column;align-items:center;gap:clamp(4px,1vh,10px);min-width:0;padding:0 6px}
+#scr-result.many .res-half .head{font-size:clamp(22px,3.6vh,36px)}
+#scr-result.many .res-half .basket .bimg{width:clamp(60px,9vh,96px);height:clamp(48px,7vh,76px)}
+#scr-result.many .res-half .who svg{width:clamp(44px,7vh,66px);height:clamp(44px,7vh,66px)}
+#scr-result.many .res-half .basket .score{font-size:clamp(30px,5vh,48px)}
 .res-half .btn{font-size:clamp(18px,2.6vh,26px);min-height:54px}
 .res-divider{height:2px;width:80%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent)}
 .winner .bimg{animation:winhop .7s ease-in-out infinite alternate}
@@ -232,20 +256,28 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .pcard .nm{font-size:clamp(16px,1.9vw,21px);font-weight:800;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pcard.pressed{transform:scale(.94)}
 .pcard.sel{background:rgba(255,213,74,.25);box-shadow:0 0 0 4px var(--gold) inset,0 0 26px rgba(255,213,74,.5);animation:popsel .35s cubic-bezier(.3,1.6,.5,1)}
-.pick-half.p1 .pcard.sel{background:rgba(62,224,255,.22);box-shadow:0 0 0 4px var(--p1) inset,0 0 26px rgba(62,224,255,.5)}
-.pick-half.p2 .pcard.sel{background:rgba(255,122,192,.22);box-shadow:0 0 0 4px var(--p2) inset,0 0 26px rgba(255,122,192,.5)}
+.pick-zone.p1 .pcard.sel{background:rgba(62,224,255,.22);box-shadow:0 0 0 4px var(--p1) inset,0 0 26px rgba(62,224,255,.5)}
+.pick-zone.p2 .pcard.sel{background:rgba(255,122,192,.22);box-shadow:0 0 0 4px var(--p2) inset,0 0 26px rgba(255,122,192,.5)}
+.pick-zone.p3 .pcard.sel{background:rgba(157,255,122,.22);box-shadow:0 0 0 4px var(--p3) inset,0 0 26px rgba(157,255,122,.5)}
+.pick-zone.p4 .pcard.sel{background:rgba(255,179,71,.22);box-shadow:0 0 0 4px var(--p4) inset,0 0 26px rgba(255,179,71,.5)}
 @keyframes popsel{from{transform:scale(.85)}to{transform:scale(1)}}
 .pcard.taken{opacity:.25;pointer-events:none}
 .pcard.add{box-shadow:0 0 0 3px rgba(255,255,255,.35) inset;background:rgba(255,255,255,.05);justify-content:center}
 .pcard .plus{font-size:clamp(54px,7vw,72px);line-height:1;font-weight:900;color:var(--gold)}
 .hint{margin:0;font-size:clamp(17px,2.1vw,22px);color:var(--muted);font-weight:700;text-align:center;max-width:720px}
 #scr-pick.duelpick{padding:0;gap:0;justify-content:stretch}
-.pick-half{flex:1 1 0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.6vh,16px);
+.pick-half{flex:1 1 0;width:100%;display:flex;justify-content:center;align-items:stretch;min-height:0;
   padding:10px max(76px,var(--sar)) max(10px,var(--sab)) max(76px,var(--sal))}
 .pick-half.top{transform:rotate(180deg);padding-bottom:max(10px,var(--sat))}
-.pick-half h3{margin:0;font-size:clamp(22px,3.2vh,32px);font-weight:900;text-align:center}
-.pick-half.p1 h3{color:var(--p1)} .pick-half.p2 h3{color:var(--p2)}
-.pick-half .pcard{width:clamp(92px,11vw,128px)}
+.pick-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.6vh,16px);padding:0 6px;min-width:0}
+.pick-zone h3{margin:0;font-size:clamp(22px,3.2vh,32px);font-weight:900;text-align:center}
+.pick-zone.p1 h3{color:var(--p1)} .pick-zone.p2 h3{color:var(--p2)} .pick-zone.p3 h3{color:var(--p3)} .pick-zone.p4 h3{color:var(--p4)}
+.pick-zone .pcard{width:clamp(92px,11vw,128px)}
+.duelpick.many .pick-half{padding-left:max(66px,var(--sal));padding-right:max(66px,var(--sar))}
+.duelpick.many .pick-zone h3{font-size:clamp(18px,2.6vh,26px)}
+.duelpick.many .pick-grid{gap:8px}
+.duelpick.many .pcard{width:clamp(70px,8vw,100px);padding:6px 4px 8px;border-radius:18px}
+.duelpick.many .pcard .nm{font-size:clamp(13px,1.5vw,16px)}
 .duelpick .btn-exit{left:max(10px,var(--sal));top:50%;margin-top:-28px;font-size:30px}
 .plist{gap:10px}
 .prow{display:flex;align-items:center;gap:clamp(8px,1.4vw,14px);padding:10px 14px;border-radius:22px;background:rgba(255,255,255,.08)}
@@ -271,9 +303,9 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .key.pressed{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.35);background:#ffe36e}
 .key.del{flex:1.6 1 0;max-width:110px;background:#ffb3a8}
 .key.space{flex:0 1 60%;max-width:420px;font-size:clamp(16px,1.9vw,22px)}
-.fig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.4vw,14px);width:100%}
-@media (orientation:portrait){.fig-grid{grid-template-columns:repeat(6,1fr)}}
-@media (orientation:portrait) and (max-width:640px){.fig-grid{grid-template-columns:repeat(3,1fr)}}
+.fig-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(6px,1.2vw,12px);width:100%}
+@media (orientation:portrait){.fig-grid{grid-template-columns:repeat(7,1fr)}}
+@media (orientation:portrait) and (max-width:640px){.fig-grid{grid-template-columns:repeat(4,1fr)}}
 .fig{appearance:none;border:0;cursor:pointer;background:rgba(255,255,255,.08);border-radius:22px;padding:10px 6px;display:flex;flex-direction:column;
   align-items:center;gap:4px;box-shadow:0 0 0 2px rgba(255,255,255,.15) inset;transition:transform .12s;touch-action:manipulation}
 .fig svg{width:86%;height:auto;overflow:visible;will-change:transform}
@@ -323,8 +355,11 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
     <h2 class="menu-title">Wie wollt ihr spielen?</h2>
     <div class="mode-cards">
       <button class="card" data-action="solo"><div class="ico" id="ico-solo"></div><b>Allein</b><span>60 Sekunden gegen die Uhr</span></button>
-      <button class="card" data-action="duel"><div class="ico" id="ico-duel"></div><b>Zu zweit</b><span>20 Runden · iPad flach hinlegen</span></button>
+      <button class="card" data-action="duel"><div class="ico many" id="ico-duel"></div><b>Zu zweit</b><span>20 Runden</span></button>
+      <button class="card" data-action="trio"><div class="ico many" id="ico-trio"></div><b>Zu dritt</b><span>20 Runden</span></button>
+      <button class="card" data-action="quad"><div class="ico many" id="ico-quad"></div><b>Zu viert</b><span>20 Runden</span></button>
     </div>
+    <p class="hint">Zu zweit, dritt oder viert: iPad flach auf den Tisch legen. Je zwei Kinder sitzen an einer langen Seite.</p>
     <div class="menu-row">
       <button class="btn alt" data-action="profiles">Profile</button>
       <button class="btn alt" data-action="stats">Statistik</button>
@@ -689,6 +724,8 @@ const Art = (() => {
     { id: 'pink',   c: ['#ffd0de', '#f27499', '#a93561'], sx: 1.04, sy: .9,  ribs: 4, rib: .035, dip: .06 },
     { id: 'beef',   c: ['#ff8a6a', '#d82b1c', '#760c0c'], sx: 1.14, sy: .8,  ribs: 8, rib: .065, dip: .08, grooves: true },
     { id: 'heart',  c: ['#ff9aa8', '#e8394e', '#8e1028'], sx: .92,  sy: .9,  ribs: 0, rib: 0,   dip: .07, heart: true, R: 37 },
+    // „Feuerwerk“: leuchtend rot-orange mit goldenen Strahlen, die vom Stielansatz aus nach unten sprühen
+    { id: 'feuerwerk', c: ['#ffb36b', '#ff3d14', '#9e1208'], sx: 1.02, sy: .92, ribs: 0, rib: 0, dip: .06, burst: '#ffd23f' },
   ];
   const CY = 57;
   function bodyPath(v) {
@@ -750,7 +787,21 @@ const Art = (() => {
       for (const o of [-30, -20, -10, 0, 10, 20, 30]) s += `<path d="M${50 + o * .4} 18 Q${50 + o * 1.5} 55 ${50 + o * .5} 98" stroke-width="${o % 20 ? 2.2 : 3.4}"/>`;
       s += `</g>`;
     }
-    if (v.shoulders) s += `<ellipse cx="50" cy="28" rx="36" ry="15" fill="${v.shoulders}" opacity=".45" clip-path="url(#tc-${v.id}${sfx})"/>`;
+    if (v.burst) { // Feuerwerk-Strahlen + Funken, auf den Tomatenkörper begrenzt
+      const ox = 50, oy = topY(v) + 3;
+      s += `<g clip-path="url(#tc-${v.id}${sfx})" stroke="${v.burst}" stroke-linecap="round" fill="none" opacity=".85">`;
+      for (let k = 0; k < 9; k++) {
+        const a = Math.PI * (.06 + .88 * k / 8), x2 = ox + Math.cos(a) * 62, y2 = oy + Math.sin(a) * 62;
+        s += `<path d="M${ox} ${oy}L${x2.toFixed(1)} ${y2.toFixed(1)}" stroke-width="${k % 2 ? 1.5 : 2.6}"${k % 2 ? ' stroke-dasharray="2 5"' : ''}/>`;
+      }
+      s += `</g><g fill="#fff3b0" clip-path="url(#tc-${v.id}${sfx})">`;
+      for (const [r, a] of [[34, .2], [44, .5], [30, .75], [48, .9], [38, .35], [26, .6]]) {
+        const ang = Math.PI * a;
+        s += `<circle cx="${(ox + Math.cos(ang) * r).toFixed(1)}" cy="${(oy + Math.sin(ang) * r).toFixed(1)}" r="1.7"/>`;
+      }
+      s += `</g>`;
+    }
+    if (v.shoulders) s +=`<ellipse cx="50" cy="28" rx="36" ry="15" fill="${v.shoulders}" opacity=".45" clip-path="url(#tc-${v.id}${sfx})"/>`;
     if (v.ribs >= 4) {
       s += `<g fill="none" stroke="${v.c[2]}" stroke-width="${v.grooves ? 2.4 : 1.6}" opacity="${v.grooves ? .45 : .3}" stroke-linecap="round">`;
       for (const o of v.grooves ? [-30, -15, 15, 30] : [-22, 22]) s += `<path d="M${50 + o * .25} ${CY - 26} Q${50 + o * .95} ${CY} ${50 + o * .85} ${CY + 26}"/>`;
@@ -801,6 +852,7 @@ const Art = (() => {
     { id: 'schleife', name: 'Schleifen-Tomate', variety: 'pink' },
     { id: 'musik', name: 'Musik-Tomate', variety: 'zebra' },
     { id: 'astro', name: 'Astro-Tomate', variety: 'krim' },
+    { id: 'feuerwerk', name: 'Feuerwerk-Tomate', variety: 'feuerwerk' },
   ];
   const GUEST_FIG = { id: 'gast', name: 'Gast', variety: 'beef' };
   const FACE = `<g class="face">
@@ -835,6 +887,16 @@ const Art = (() => {
       <path d="M24 91Q50 103 76 91L73 99Q50 108 27 99Z" fill="#cfd8e8" stroke="#9aa8c2" stroke-width="1.2"/>
       <path d="M50 9V1" stroke="#dfeaff" stroke-width="2.2"/><circle cx="50" cy="0" r="3.2" fill="#ff5a6a"/>`,
   };
+  // Feuerwerk-Tomate: Sonnenbrille hochgeschoben auf die Stirn (Augen frei), dazu Funkelsterne
+  const star = (x, y, r, c) => `<path d="M${x} ${y - r}L${x + r * .3} ${y - r * .3}L${x + r} ${y}L${x + r * .3} ${y + r * .3}L${x} ${y + r}L${x - r * .3} ${y + r * .3}L${x - r} ${y}L${x - r * .3} ${y - r * .3}Z" fill="${c}"/>`;
+  ACCESSORY.feuerwerk = `<g transform="rotate(-5 50 32)">
+      <path d="M24 32L15 29M76 32L85 29" stroke="#1d1530" stroke-width="2.6" stroke-linecap="round"/>
+      <rect x="23" y="25" width="24" height="14" rx="6.5" fill="#241a3a" stroke="#ff4fa0" stroke-width="2.2"/>
+      <rect x="53" y="25" width="24" height="14" rx="6.5" fill="#241a3a" stroke="#ff4fa0" stroke-width="2.2"/>
+      <path d="M47 31Q50 28.5 53 31" stroke="#ff4fa0" stroke-width="2.2" fill="none"/>
+      <path d="M27 30L32 27.5M57 30L62 27.5" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".75"/>
+      <path d="M29 35L36 31M59 35L66 31" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity=".45"/></g>
+    ${star(87, 14, 6, '#ffd23f')}${star(12, 20, 4.5, '#ffd23f')}${star(93, 68, 4, '#fff3b0')}${star(6, 74, 3.5, '#ff9ad0')}`;
   const figure = id => FIGURES.find(f => f.id === id) || GUEST_FIG;
   /** Figur als SVG (nutzt die globalen <defs>). id unbekannt/null → Gast-Tomate. */
   function figureSVG(id) {
@@ -909,13 +971,31 @@ const FX = (() => {
 /* ---------------- Game: Spiel-Engine ---------------- */
 const Game = (() => {
   const scr = document.getElementById('scr-game');
-  const SOLO_MS = 60000, DUEL_ROUNDS = 20, NEXT_DELAY = 1250, FLY_S = .62;
+  const SOLO_MS = 60000, ROUNDS = 20, NEXT_DELAY = 1250, FLY_S = .62;   // ROUNDS: Mehrspieler-Modi
   let g = null;      // laufendes Spiel
   let gid = 0;       // Token gegen veraltete Timeouts
   const later = (fn, ms) => { const id = gid; setTimeout(() => { if (g && g.id === id && !g.over) fn(); }, ms); };
 
+  /* ----- Spieler-Plätze -----
+     Jeder Platz ist ein Rechteck im Spielfeld (Anteile 0..1) mit Drehung. Alle Plätze eines Modus sind gleich
+     groß und bekommen dieselbe Tomaten-Anordnung (bei 180° gedreht) – so hat niemand einen Vorteil.
+     Index = Spielernummer - 1. Oben sitzende Spieler (rot 180) lesen alles auf dem Kopf stehend richtig. */
+  const SLOTS = {
+    solo: [{ x: 0, y: 0, w: 1, h: 1, rot: 0 }],
+    duel: [{ x: 0, y: .5, w: 1, h: .5, rot: 0 }, { x: 0, y: 0, w: 1, h: .5, rot: 180 }],
+    trio: [{ x: 0, y: .5, w: .5, h: .5, rot: 0 }, { x: .25, y: 0, w: .5, h: .5, rot: 180 }, { x: .5, y: .5, w: .5, h: .5, rot: 0 }],
+    quad: [{ x: 0, y: .5, w: .5, h: .5, rot: 0 }, { x: .5, y: 0, w: .5, h: .5, rot: 180 },
+           { x: .5, y: .5, w: .5, h: .5, rot: 0 }, { x: 0, y: 0, w: .5, h: .5, rot: 180 }],
+  };
+  const COLORS = ['#3ee0ff', '#ff7ac0', '#9dff7a', '#ffb347'];
+  const hexA = (hex, a) => `rgba(${parseInt(hex.slice(1, 3), 16)},${parseInt(hex.slice(3, 5), 16)},${parseInt(hex.slice(5, 7), 16)},${a})`;
+  /** Plätze einer Bildschirmhälfte in Leserichtung: unten links→rechts, oben (gedrehte Leiste) rechts→links */
+  const slotsInHalf = (mode, top) => SLOTS[mode].map((s, i) => ({ ...s, i }))
+    .filter(s => (s.rot === 180) === top).sort((a, b) => top ? b.x - a.x : a.x - b.x);
+
   /* ----- DOM ----- */
-  const taskHTML = ring => `<div class="task">${ring ? '<svg class="ring"><path class="track"/><path class="prog"/></svg>' : ''}<div class="task-text"></div></div>`;
+  const taskHTML = (ring, sub) => `<div class="task">${ring ? '<svg class="ring"><path class="track"/><path class="prog"/></svg>' : ''}<div class="task-text"></div>${
+    sub ? `<div class="task-sub">Runde <span class="rnd">1</span>/${ROUNDS}</div>` : ''}</div>`;
   const basketHTML = (cls, color, p) => `<div class="basket ${cls}" data-p="${p}"><div class="halo"></div>${Art.basketSVG(color)}<div class="score">0</div></div>`;
   /** Figur + Name des Spielers neben dem Korb */
   const whoHTML = (mode, p) => {
@@ -923,17 +1003,23 @@ const Game = (() => {
     return `<div class="who" data-p="${p}">${Art.figureSVG(prof ? prof.fig : null)}<span class="nm">${Util.esc(UI.displayName(prof, p, mode))}</span></div>`;
   };
   function buildDOM(mode) {
-    scr.classList.remove('solo', 'duel'); scr.classList.add(mode);
+    scr.classList.remove('solo', 'duel', 'trio', 'quad', 'multi'); scr.classList.add(mode);
     if (mode === 'solo') {
       scr.innerHTML = `
         <div class="bar solo-top"><div class="l"></div>${taskHTML(true)}<div class="r"><span class="timeleft">60</span>&nbsp;s</div></div>
         <div class="field"></div>
         <div class="bar"><div class="l"></div><div class="solo-mid">${whoHTML(mode, 0)}${basketHTML('solo', '#ffd54a', 0)}</div><div class="r"></div></div>`;
     } else {
-      const half = (p, color) => `<div class="l">${whoHTML(mode, p)}${basketHTML('p' + (p + 1), color, p)}</div>${taskHTML(false)}<div class="r">Runde&nbsp;<span class="rnd">1</span>/${DUEL_ROUNDS}</div>`;
-      scr.innerHTML = `<div class="bar top">${half(1, '#ff7ac0')}</div>
-        <div class="field"><div class="half p2"></div><div class="half p1"></div></div>
-        <div class="bar">${half(0, '#3ee0ff')}</div>`;
+      scr.classList.add('multi');
+      const compact = mode !== 'duel';   // halbe Breite pro Spieler: Rundenzähler in der Aufgabe
+      const bar = top => `<div class="bar multi ${top ? 'top' : ''}">${slotsInHalf(mode, top).map(s =>
+        `<div class="seg ${compact ? 'compact' : ''}" style="width:${s.w * 100}%">
+          <div class="l">${whoHTML(mode, s.i)}${basketHTML('p' + (s.i + 1), COLORS[s.i], s.i)}</div>
+          ${taskHTML(false, compact)}<div class="r">Runde&nbsp;<span class="rnd">1</span>/${ROUNDS}</div></div>`).join('')}</div>`;
+      const zones = SLOTS[mode].map((s, i) => `<div class="zone p${i + 1}" style="left:${s.x * 100}%;top:${s.y * 100}%;width:${s.w * 100}%;height:${s.h * 100}%;
+        background:linear-gradient(${s.rot ? 'to bottom' : 'to top'},${hexA(COLORS[i], .05)},${hexA(COLORS[i], .2)});
+        box-shadow:inset 0 0 0 2px ${hexA(COLORS[i], .4)}"></div>`).join('');
+      scr.innerHTML = `${bar(true)}<div class="field">${zones}</div>${bar(false)}`;
     }
     scr.insertAdjacentHTML('beforeend', `<div id="tlayer"></div><button class="btn-exit" data-action="quit" aria-label="Spiel beenden">✕</button><div class="overlay" id="cdl"></div>`);
     const field = scr.querySelector('.field');
@@ -942,7 +1028,7 @@ const Game = (() => {
       field, tlayer: scr.querySelector('#tlayer'), cdl: scr.querySelector('#cdl'),
       tasks: [...scr.querySelectorAll('.task')], rounds: [...scr.querySelectorAll('.rnd')],
       timeEl: scr.querySelector('.timeleft'),
-      baskets: [scr.querySelector('.basket[data-p="0"]'), scr.querySelector('.basket[data-p="1"]')].filter(Boolean),
+      baskets: SLOTS[mode].map((_, i) => scr.querySelector(`.basket[data-p="${i}"]`)),
     };
   }
 
@@ -950,24 +1036,30 @@ const Game = (() => {
   function measure() {
     const f = g.dom.field;
     g.F = { x: f.offsetLeft, y: f.offsetTop, w: f.offsetWidth, h: f.offsetHeight };
-    g.F.mid = g.F.y + g.F.h / 2;
     setupRings();
   }
-  /** Solo: Raster über das ganze Feld. Duell: Raster nur für die untere Hälfte (Spieler 1);
-      die obere Hälfte (Spieler 2) bekommt dasselbe Feld um 180° gedreht – exakt gleiche Bedingungen. */
+  /** Raster innerhalb EINES Platzes (Koordinaten 0..1 relativ zum Platz). Alle Plätze nutzen dasselbe Raster. */
   function cells(n) {
-    const F = g.F, duel = g.mode === 'duel';
-    const H = duel ? F.h / 2 : F.h, aspect = F.w / H;
-    let rows, cols;
-    if (duel) { rows = aspect >= 2.2 ? 1 : 2; cols = Math.ceil(n / rows); }
-    else { rows = aspect >= 1.15 ? 2 : aspect >= .75 ? 3 : 4; cols = Math.ceil(8 / rows); }
-    const padX = duel ? 70 : 14, padY = duel ? 8 : 10, y0 = duel ? F.h / 2 : 0;
-    const cw = (F.w - 2 * padX) / cols, ch = (H - 2 * padY) / rows;
-    const size = Util.clamp(Math.min(cw, ch) * .84, 60, 190);
+    const F = g.F, slot = SLOTS[g.mode][0], sw = slot.w * F.w, sh = slot.h * F.h;
+    let rows, cols, padX, padY;
+    if (g.mode === 'solo') {
+      const aspect = sw / sh;
+      rows = aspect >= 1.15 ? 2 : aspect >= .75 ? 3 : 4; cols = Math.ceil(8 / rows); padX = 14; padY = 10;
+    } else {
+      // 1–3 Reihen: die Variante mit den größten Tomaten gewinnt
+      padX = g.mode === 'duel' ? 70 : 60; padY = 8;
+      let best = 0;
+      for (let r = 1; r <= 3; r++) {
+        const c = Math.ceil(n / r), s = Math.min((sw - 2 * padX) / c, (sh - 2 * padY) / r);
+        if (s > best) { best = s; rows = r; cols = c; }
+      }
+    }
+    const cw = (sw - 2 * padX) / cols, ch = (sh - 2 * padY) / rows;
+    const size = Util.clamp(Math.min(cw, ch) * .84, 50, 190);
     const list = [];
     for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
-      list.push({ fx: (padX + cw * (c + .5)) / F.w, fy: (y0 + padY + ch * (r + .5)) / F.h });
-    return { list, size, jx: Math.max(0, (cw - size) / 2 - 6) / F.w, jy: Math.max(0, (ch - size) / 2 - 6) / F.h };
+      list.push({ lx: (padX + cw * (c + .5)) / sw, ly: (padY + ch * (r + .5)) / sh });
+    return { list, size, jx: Math.max(0, (cw - size) / 2 - 6) / sw, jy: Math.max(0, (ch - size) / 2 - 6) / sh };
   }
 
   function spawn(round) {
@@ -977,17 +1069,16 @@ const Game = (() => {
     const values = Logic.shuffle(round.values);
     const vars = Logic.shuffle(Art.VARIETIES);
     const order = Logic.shuffle([...Array(n).keys()]); // Stagger-Reihenfolge
-    const sides = g.mode === 'duel' ? [0, 1] : [0];
     chosen.forEach((cell, i) => {
       const base = { value: values[i], correct: values[i] === round.answer, variety: vars[i % vars.length],
         size, amp: Math.min(10, size * .07), idx: i, delay: order[i] * 75,
-        fx: cell.fx + Util.rand(-jx, jx), fy: cell.fy + Util.rand(-jy, jy),
+        lx: cell.lx + Util.rand(-jx, jx), ly: cell.ly + Util.rand(-jy, jy),
         ph: Util.rand(0, 6.28), f1: Util.rand(.6, 1.1), f2: Util.rand(.5, .95), f3: Util.rand(.35, .75) };
-      for (const side of sides) g.tomatoes.push(makeTomato(base, side));
+      SLOTS[g.mode].forEach((slot, side) => g.tomatoes.push(makeTomato(base, side, slot)));
     });
   }
-  /** side 0 = unten / Solo, side 1 = oben (Duell): Position und Bewegung punktgespiegelt, um 180° gedreht. */
-  function makeTomato(b, side) {
+  /** Tomate für einen Platz: bei 180° Position und Schwebebewegung punktgespiegelt und gedreht. */
+  function makeTomato(b, side, slot) {
     const v = b.variety, el = Util.el('div', 'tomato');
     el.style.width = el.style.height = b.size + 'px';
     el.style.opacity = '0';
@@ -996,10 +1087,11 @@ const Game = (() => {
     el.appendChild(glow);
     el.insertAdjacentHTML('beforeend', Art.tomatoSVG(v, b.value));
     g.dom.tlayer.appendChild(el);
-    const t = Object.assign({}, b, { el, glow, faul: el.querySelector('.faul'), side, mir: 1, base: 0,
+    const flip = slot.rot === 180;
+    return Object.assign({}, b, { el, glow, faul: el.querySelector('.faul'), side,
+      fx: slot.x + (flip ? 1 - b.lx : b.lx) * slot.w, fy: slot.y + (flip ? 1 - b.ly : b.ly) * slot.h,
+      mir: flip ? -1 : 1, base: flip ? 180 : 0,
       state: 'pop', t0: performance.now(), cx: 0, cy: 0, owner: -1 });
-    if (side === 1) Object.assign(t, { fx: 1 - b.fx, fy: 1 - b.fy, mir: -1, base: 180 });
-    return t;
   }
 
   /* ----- Aufgabe & Ring ----- */
@@ -1028,14 +1120,15 @@ const Game = (() => {
   }
 
   /* ----- Ablauf ----- */
-  /** profiles: [Profil | null (Gast), …] – Index 0 = unten / Solo, 1 = oben */
+  /** mode: 'solo' | 'duel' | 'trio' | 'quad'; profiles: [Profil | null (Gast), …] in Platz-Reihenfolge */
   function start(mode, profiles = []) {
     gid++;
     if (g) g.over = true;
     FX.clear();
-    g = { id: gid, mode, round: 0, tomatoes: [], task: null, accepting: false, running: false, over: false, paused: false,
-      prof: [profiles[0] || null, profiles[1] || null],
-      players: [{ score: 0, shown: 0, wrong: 0, log: [] }, { score: 0, shown: 0, wrong: 0, log: [] }],
+    const n = SLOTS[mode].length;
+    g = { id: gid, mode, n, round: 0, tomatoes: [], task: null, accepting: false, running: false, over: false, paused: false,
+      prof: SLOTS[mode].map((_, i) => profiles[i] || null),
+      players: SLOTS[mode].map(() => ({ score: 0, shown: 0, wrong: 0, log: [] })),
       endAt: 0, lastTick: 99 };
     g.dom = buildDOM(mode);
     measure();
@@ -1048,24 +1141,27 @@ const Game = (() => {
   }
   function countdown(done) {
     const steps = ['3', '2', '1', 'Los!'];
-    const pos = g.mode === 'duel' ? ['bottom', 'top'] : ['solo'];
     steps.forEach((txt, i) => later(() => {
       g.dom.cdl.innerHTML = '';
       Sound.count(i === 3);
-      for (const p of pos) {
-        const d = Util.el('div', 'cd ' + p); d.innerHTML = `<span>${txt}</span>`;
+      SLOTS[g.mode].forEach(s => {
+        const d = Util.el('div', 'cdm' + (g.n > 2 ? ' small' : ''));
+        d.style.left = g.F.x + (s.x + s.w / 2) * g.F.w + 'px';
+        d.style.top = g.F.y + (s.y + s.h / 2) * g.F.h + 'px';
+        d.style.transform = `translate(-50%,-50%) rotate(${s.rot}deg)`;
+        d.innerHTML = `<span>${txt}</span>`;
         g.dom.cdl.appendChild(d);
         FX.anim(d.firstChild, [{ transform: 'scale(.2)', opacity: 0 }, { transform: 'scale(1.1)', opacity: 1, offset: .3 },
           { transform: 'scale(1)', opacity: 1, offset: .7 }, { transform: 'scale(1.3)', opacity: 0 }], { duration: 640, fill: 'forwards' });
-      }
+      });
       if (i === 3) later(() => { g.dom.cdl.innerHTML = ''; done(); }, 450);
     }, i * 620));
   }
   function nextRound() {
     if (!g.running) return;
-    if (g.mode === 'duel' && g.round >= DUEL_ROUNDS) return finish();
+    if (g.n > 1 && g.round >= ROUNDS) return finish();
     g.round++;
-    const r = Logic.makeRound(Math.random, { count: g.mode === 'duel' ? 6 : 0, last: g.task });
+    const r = Logic.makeRound(Math.random, { count: g.n > 1 ? 6 : 0, last: g.task });
     g.task = r;
     showTask(r);
     spawn(r);
@@ -1090,17 +1186,15 @@ const Game = (() => {
   function finish() {
     g.running = false; g.over = true;
     Pwa.wake(false);
-    const [p1, p2] = g.players;
     let res;
     if (g.mode === 'solo') {
-      const prof = g.prof[0], prev = prof ? prof.best || 0 : 0, newBest = !!prof && p1.score > prev;
+      const p1 = g.players[0], prof = g.prof[0], prev = prof ? prof.best || 0 : 0, newBest = !!prof && p1.score > prev;
       if (newBest) { prof.best = p1.score; Store.save(); }  // Rekord nur mit Profil
       const hits = p1.log.filter(l => l.correct);
       res = { mode: 'solo', players: g.prof, score: p1.score, best: Math.max(prev, p1.score), newBest,
         avgMs: hits.length ? hits.reduce((s, l) => s + l.ms, 0) / hits.length : 0, wrong: p1.wrong, log: p1.log };
     } else {
-      res = { mode: 'duel', players: g.prof, scores: [p1.score, p2.score],
-        winner: p1.score > p2.score ? 0 : p2.score > p1.score ? 1 : -1, logs: [p1.log, p2.log] };
+      res = { mode: g.mode, players: g.prof, scores: g.players.map(p => p.score), logs: g.players.map(p => p.log) };
     }
     UI.showResult(res);
   }
@@ -1117,9 +1211,10 @@ const Game = (() => {
     e.preventDefault();
     if (!g || g.over || g.paused || !g.running) return;
     const now = performance.now(), x = e.clientX, y = e.clientY;
-    // Duell: Spieler nach Spielfeldhälfte (unten = Spieler 1, oben = Spieler 2);
-    // jeder kann nur die Tomaten in seinem eigenen Feld pflücken.
-    const player = g.mode === 'duel' && y < g.F.mid ? 1 : 0;
+    // Spieler = Platz, in dem der Finger landet; jeder pflückt nur Tomaten in seinem eigenen Feld.
+    const fx = (x - g.F.x) / g.F.w, fy = (y - g.F.y) / g.F.h;
+    const player = SLOTS[g.mode].findIndex(s => fx >= s.x && fx < s.x + s.w && fy >= s.y && fy < s.y + s.h);
+    if (player < 0) return;
     let best = null, bd = Infinity;
     for (const t of g.tomatoes) {
       const visible = t.state === 'idle' || (t.state === 'pop' && now - t.t0 > t.delay + 100);
@@ -1147,7 +1242,7 @@ const Game = (() => {
         o.leaveDir = o.mir;
       }
     }
-    if (g.mode === 'duel' || performance.now() < g.endAt) later(nextRound, NEXT_DELAY);
+    if (g.n > 1 || performance.now() < g.endAt) later(nextRound, NEXT_DELAY);
   }
   function hitWrong(t, player, now) {
     if (t.state === 'rot') return;
@@ -1264,7 +1359,7 @@ const Game = (() => {
     }
   }
   function onResize() { if (g && !g.over) measure(); }
-  return { start, update, quit, pause, resume, onResize,
+  return { start, update, quit, pause, resume, onResize, SLOTS, COLORS, slotsInHalf,
     get active() { return !!(g && !g.over); }, get mode() { return g ? g.mode : 'solo'; } };
 })();
 
@@ -1284,7 +1379,7 @@ const UI = (() => {
   const fmtS = ms => (ms / 1000).toFixed(1).replace('.', ',');
   /** „Gut gespielt“ → „Gut gespielt, Lena“ (Gast ohne Namen) */
   const withName = (txt, p) => p ? `${txt}, ${esc(p.name)}` : txt;
-  const displayName = (p, i, mode) => p ? p.name : mode === 'duel' ? `Spieler ${i + 1}` : 'Gast';
+  const displayName = (p, i, mode) => p ? p.name : mode === 'solo' ? 'Gast' : `Spieler ${i + 1}`;
 
   function go(name) {
     if (name === current) return;
@@ -1327,7 +1422,7 @@ const UI = (() => {
     Game.pause();
     dialog(title, text, [
       { label: 'Weiterspielen', fn: () => Game.resume() },
-      { label: 'Beenden', cls: 'danger', fn: () => { Game.quit(); go('menu'); } }], Game.mode === 'duel');
+      { label: 'Beenden', cls: 'danger', fn: () => { Game.quit(); go('menu'); } }], Game.mode !== 'solo');
   }
 
   /* ----- Profil-Karte (Figur + Name) ----- */
@@ -1335,12 +1430,13 @@ const UI = (() => {
     `<button class="pcard ${cls}" ${attrs}>${Art.figureSVG(p ? p.fig : null)}<span class="nm">${p ? esc(p.name) : 'Gast'}</span></button>`;
 
   /* ----- „Wer spielt?“ ----- */
-  let pick = null; // { mode, sel: [id | 'guest' | undefined, …] }
-  function openPick(mode) { pick = { mode, sel: [] }; renderPick(); go('pick'); }
+  let pick = null; // { mode, n, sel: [id | 'guest' | undefined, …] (Index = Platz) }
+  function openPick(mode) { pick = { mode, n: Game.SLOTS[mode].length, sel: [] }; renderPick(); go('pick'); }
+  const pickTitle = (slot) => pick.sel[slot] ? 'Bereit! Warte auf die anderen …' : 'Wer sitzt hier?';
   function renderPick() {
     const el = S.pick, profs = Store.profiles;
     if (pick.mode === 'solo') {
-      el.classList.remove('duelpick');
+      el.classList.remove('duelpick', 'many');
       el.innerHTML = `<div class="pick-head"><button class="btn ghost" data-action="menu">‹ Zurück</button><h2>Wer spielt?</h2></div>
         <div class="pick-grid">
           ${profs.map(p => card(p, `data-action="pickp" data-id="${p.id}" data-side="0"`)).join('')}
@@ -1350,42 +1446,44 @@ const UI = (() => {
         ${profs.length ? '' : '<p class="hint">Tipp: Mit einem eigenen Profil merkt sich das Spiel deinen Rekord und welche Reihen noch knifflig sind.</p>'}`;
       return;
     }
+    // Mehrspieler: pro Platz ein Auswahlbereich, oben sitzende Plätze gedreht
     el.classList.add('duelpick');
-    const half = side => {
-      const mine = pick.sel[side], other = pick.sel[1 - side];
-      return `<div class="pick-half p${side + 1} ${side === 1 ? 'top' : ''}">
-        <h3>${mine ? 'Bereit! Warte auf die andere Seite …' : 'Wer sitzt hier?'}</h3>
+    el.classList.toggle('many', pick.n > 2);
+    const zone = s => `<div class="pick-zone p${s.i + 1}" data-slot="${s.i}" style="width:${s.w * 100}%">
+        <h3>${pickTitle(s.i)}</h3>
         <div class="pick-grid">
-          ${profs.map(p => card(p, `data-action="pickp" data-id="${p.id}" data-side="${side}"`,
-            (mine === p.id ? 'sel' : '') + (other === p.id ? ' taken' : ''))).join('')}
-          ${card(null, `data-action="pickp" data-id="guest" data-side="${side}"`, 'guest' + (mine === 'guest' ? ' sel' : ''))}
+          ${profs.map(p => card(p, `data-action="pickp" data-id="${p.id}" data-side="${s.i}"`)).join('')}
+          ${card(null, `data-action="pickp" data-id="guest" data-side="${s.i}"`, 'guest')}
         </div></div>`;
-    };
-    el.innerHTML = half(1) + '<div class="res-divider"></div>' + half(0) +
+    const half = top => `<div class="pick-half ${top ? 'top' : ''}">${Game.slotsInHalf(pick.mode, top).map(zone).join('')}</div>`;
+    el.innerHTML = half(true) + '<div class="res-divider"></div>' + half(false) +
       '<button class="btn-exit" data-action="menu" aria-label="Zurück zum Menü">‹</button>';
+    updatePick();
   }
-  /** Duell-Auswahl nur umfärben, nicht neu aufbauen – sonst geht ein gleichzeitiger Tipp des anderen Kindes verloren. */
+  /** Auswahl nur umfärben, nicht neu aufbauen – sonst geht ein gleichzeitiger Tipp eines anderen Kindes verloren. */
   function updatePick() {
-    for (const side of [0, 1]) {
-      const h = S.pick.querySelector(`.pick-half.p${side + 1}`), mine = pick.sel[side], other = pick.sel[1 - side];
-      h.querySelector('h3').textContent = mine ? 'Bereit! Warte auf die andere Seite …' : 'Wer sitzt hier?';
-      h.querySelectorAll('.pcard').forEach(c => {
+    S.pick.querySelectorAll('.pick-zone').forEach(z => {
+      const slot = +z.dataset.slot, mine = pick.sel[slot];
+      const others = new Set(pick.sel.filter((id, i) => i !== slot && id && id !== 'guest'));
+      z.querySelector('h3').textContent = pickTitle(slot);
+      z.querySelectorAll('.pcard').forEach(c => {
         c.classList.toggle('sel', c.dataset.id === mine);
-        c.classList.toggle('taken', c.dataset.id !== 'guest' && c.dataset.id === other);
+        c.classList.toggle('taken', others.has(c.dataset.id));
       });
-    }
+    });
   }
-  function pickProfile(id, side) {
+  function pickProfile(id, slot) {
     const prof = id === 'guest' ? null : Store.get(id);
     if (pick.mode === 'solo') return startGame('solo', [prof]);
-    if (id !== 'guest' && pick.sel[1 - side] === id) return; // jedes Profil nur einmal
-    pick.sel[side] = pick.sel[side] === id ? undefined : id; // nochmal tippen = abwählen
+    if (id !== 'guest' && pick.sel.some((s, i) => i !== slot && s === id)) return; // jedes Profil nur einmal
+    pick.sel[slot] = pick.sel[slot] === id ? undefined : id;                     // nochmal tippen = abwählen
     updatePick();
-    if (pick.sel[0] && pick.sel[1]) {
-      const chosen = pick.sel.slice();
+    const all = () => Array.from({ length: pick.n }, (_, i) => pick.sel[i]).every(Boolean);
+    if (all()) {
+      const chosen = pick.sel.slice(0, pick.n).join('|');
       setTimeout(() => {
-        if (current !== 'pick' || !pick || pick.sel[0] !== chosen[0] || pick.sel[1] !== chosen[1]) return;
-        startGame('duel', chosen.map(i => i === 'guest' ? null : Store.get(i)));
+        if (current !== 'pick' || !pick || !all() || pick.sel.slice(0, pick.n).join('|') !== chosen) return;
+        startGame(pick.mode, pick.sel.slice(0, pick.n).map(i => i === 'guest' ? null : Store.get(i)));
       }, 800);
     }
   }
@@ -1474,6 +1572,8 @@ const UI = (() => {
     start() { Sound.unlock(); go('menu'); },
     solo() { openPick('solo'); },
     duel() { openPick('duel'); },
+    trio() { openPick('trio'); },
+    quad() { openPick('quad'); },
     again() { startGame(last.mode, last.players.map(p => p && Store.get(p.id))); }, // gelöschtes Profil → Gast
     menu() { if (current === 'game') Game.quit(); FX.clear(); go('menu'); },
     stats() { go('stats'); },
@@ -1539,24 +1639,36 @@ const UI = (() => {
       };
       requestAnimationFrame(step);
     } else {
+      // Mehrspieler: pro Platz ein Ergebnis-Feld, oben sitzende gedreht; Gleichstand an der Spitze = alle gewinnen
       el.classList.add('duelres');
-      const half = i => {
-        const me = res.players[i], other = res.players[1 - i];
-        const mine = res.scores[i], theirs = res.scores[1 - i], tie = res.winner === -1, win = res.winner === i;
-        const head = tie ? 'Unentschieden!' : win ? withName('Du gewinnst', me) + '! 🏆' : withName('Gut gespielt', me) + '!';
-        const sub = tie ? `Ihr habt beide ${mine} Tomaten!` : `${esc(displayName(other, 1 - i, 'duel'))} hat ${theirs} Tomaten`;
-        return `<div class="res-half ${i === 1 ? 'top' : ''}">
+      el.classList.toggle('many', res.scores.length > 2);
+      const n = res.scores.length, top = Math.max(...res.scores);
+      const winners = res.scores.map((s, i) => s === top ? i : -1).filter(i => i >= 0);
+      const panel = s => {
+        const i = s.i, me = res.players[i], mine = res.scores[i];
+        const win = winners.includes(i), shared = winners.length > 1;
+        const rank = 1 + res.scores.filter(x => x > mine).length;
+        const head = win ? (shared ? (n === 2 ? 'Unentschieden!' : 'Gemeinsam vorne! 🏆') : withName('Du gewinnst', me) + '! 🏆')
+          : withName('Gut gespielt', me) + '!';
+        let sub;
+        if (n === 2) {
+          const o = 1 - i;
+          sub = shared ? `Ihr habt beide ${mine} Tomaten!` : `${esc(displayName(res.players[o], o, res.mode))} hat ${res.scores[o]} Tomaten`;
+        } else sub = `Platz ${rank} von ${n}`;
+        return `<div class="res-panel" style="width:${s.w * 100}%">
           <p class="head">${head}</p>
-          <div class="basket ${i ? 'p2' : 'p1'} ${win || tie ? 'winner' : ''}"><div class="halo"></div>
-            <div class="who">${Art.figureSVG(me ? me.fig : null)}</div>${Art.basketSVG(i ? '#ff7ac0' : '#3ee0ff')}<div class="score">${mine}</div></div>
-          <p class="sub">${sub}</p>
-          <div class="row"><button class="btn" data-action="again">Nochmal</button><button class="btn ghost" data-action="menu">Menü</button></div></div>`;
+          <div class="basket p${i + 1} ${win ? 'winner' : ''}"><div class="halo"></div>
+            <div class="who">${Art.figureSVG(me ? me.fig : null)}</div>${Art.basketSVG(Game.COLORS[i])}<div class="score">${mine}</div></div>
+          <p class="sub">${sub}</p></div>`;
       };
-      el.innerHTML = half(1) + '<div class="res-divider"></div>' + half(0);
+      const half = isTop => `<div class="res-half ${isTop ? 'top' : ''}">
+        <div class="res-panels">${Game.slotsInHalf(res.mode, isTop).map(panel).join('')}</div>
+        <div class="row"><button class="btn" data-action="again">Nochmal</button><button class="btn ghost" data-action="menu">Menü</button></div></div>`;
+      el.innerHTML = half(true) + '<div class="res-divider"></div>' + half(false);
     }
     go('result');
     Sound.jingle();
-    FX.confetti(res.mode === 'duel' ? 'radial' : 'rain');
+    FX.confetti(res.mode === 'solo' ? 'rain' : 'radial');
   }
 
   /* ----- Statistik (pro Profil) ----- */
@@ -1704,6 +1816,8 @@ const Pwa = (() => {
   document.getElementById('title-tomato').innerHTML = Art.tomatoSVG(V[0], null);
   document.getElementById('ico-solo').innerHTML = Art.tomatoSVG(V[2], null);
   document.getElementById('ico-duel').innerHTML = Art.tomatoSVG(V[5], null) + Art.tomatoSVG(V[3], null);
+  document.getElementById('ico-trio').innerHTML = [V[0], V[1], V[8]].map(v => Art.tomatoSVG(v, null)).join('');
+  document.getElementById('ico-quad').innerHTML = [V[7], V[3], V[2], V[4]].map(v => Art.tomatoSVG(v, null)).join('');
   Pwa.registerSW();
   Pwa.guards();
   UI.init();
