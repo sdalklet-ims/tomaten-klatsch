@@ -328,10 +328,52 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .res-fig svg{width:clamp(90px,15vmin,140px);height:auto;overflow:visible}
 .res-fig.winner svg,.winner .who svg{animation:winhop .7s ease-in-out infinite alternate}
 .res-half .who svg{width:clamp(56px,9vh,84px);height:clamp(56px,9vh,84px)}
+/* Planeten-Reise */
+.card.wide{width:min(1000px,100%);flex-direction:row;justify-content:center;gap:clamp(14px,2.5vw,28px);padding:12px 24px}
+.card.wide .ico{height:clamp(64px,10vmin,96px);align-items:center}
+.card.wide .ico svg{height:100%;width:auto;margin-left:-8px}
+.wide-txt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
+.plsvg{overflow:visible}
+.plnum{font-weight:900;fill:#fff;stroke:rgba(30,8,40,.8);stroke-width:6px;paint-order:stroke fill;font-family:var(--font)}
+#scr-map{justify-content:flex-start;gap:clamp(6px,1.4vh,14px)}
+.map-head{display:flex;align-items:center;gap:14px;width:100%;max-width:1100px}
+.map-head h2{margin:0;flex:1;font-size:clamp(24px,3.6vw,40px);font-weight:900;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-prog{font-size:clamp(15px,1.9vw,21px);font-weight:800;color:var(--gold);white-space:nowrap}
+.map-area{position:relative;flex:1 1 auto;width:100%;max-width:1100px;min-height:0}
+.route{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.route polyline{fill:none;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.route .r-all{stroke:rgba(255,255,255,.22);stroke-width:4;stroke-dasharray:2 12}
+.route .r-done{stroke:var(--gold);stroke-width:4;stroke-dasharray:2 12;opacity:.85}
+.pbtn{--ps:clamp(66px,12.5vmin,118px);position:absolute;translate:-50% -50%;width:var(--ps);height:var(--ps);padding:0;border:0;background:none;
+  cursor:pointer;touch-action:manipulation;transition:transform .12s}
+.pbtn.big{--ps:clamp(84px,16vmin,150px)}
+.pbtn .plsvg{width:100%;height:100%;display:block;animation:float 6s ease-in-out infinite}
+.pbtn:nth-child(odd) .plsvg{animation-duration:7.5s;animation-direction:reverse}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.pbtn.pressed{transform:scale(.92)}
+.pbtn.locked .plsvg{opacity:.35;filter:grayscale(.8)}
+.pbtn .lock{position:absolute;left:50%;top:50%;width:26%;translate:-50% -50%}
+.pbtn .flag{position:absolute;right:-6%;top:-22%;width:30%}
+.pl-stars{position:absolute;left:50%;top:100%;translate:-50% 0;display:flex;gap:2px;font-size:clamp(16px,2.4vmin,24px);line-height:1;margin-top:4px}
+.pl-stars i,.pr-stars i{font-style:normal;color:rgba(255,255,255,.22);display:inline-block}
+.pl-stars i.on,.pr-stars i.on{color:var(--gold);text-shadow:0 0 10px rgba(255,213,74,.8)}
+.rec-ring{position:absolute;inset:-14%;border-radius:50%;border:3px dashed var(--hurry);animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rec-tag{position:absolute;left:50%;bottom:112%;translate:-50% 0;white-space:nowrap;padding:3px 10px;border-radius:999px;
+  background:var(--hurry);color:#fff;font-weight:900;font-size:clamp(12px,1.5vmin,15px)}
+.map-fig{position:absolute;width:clamp(44px,7vmin,66px);translate:-50% -118%;pointer-events:none;z-index:2}
+.map-fig svg{width:100%;height:auto;overflow:visible;animation:bob 2.4s ease-in-out infinite}
+.map-tip{max-width:1100px;font-size:clamp(17px,2.2vw,24px)}
+.planet-badge{margin-left:64px;gap:8px;font-weight:900;font-size:clamp(16px,2vw,22px);color:#fff}
+.planet-badge .plsvg{width:clamp(58px,9vh,80px);height:clamp(58px,9vh,80px);flex:0 0 auto}
+#scr-game.planet .task{background:rgba(20,8,50,.55);border-radius:999px;box-shadow:0 0 0 3px rgba(255,255,255,.15) inset}
+.planet-res .pr-row{display:flex;align-items:center;gap:clamp(12px,2vw,24px)}
+.planet-res .pr-row .plsvg{width:clamp(100px,17vmin,160px);height:auto}
+.pr-stars{display:flex;gap:10px;font-size:clamp(48px,9vmin,80px);line-height:1}
 #testres{position:absolute;z-index:50;left:10px;bottom:10px;padding:8px 12px;border-radius:10px;font:14px/1.3 monospace;background:#000c}
 
 @media (prefers-reduced-motion: reduce){
-  .nebula,.pulse,.title-tomato,.task.hurry,.winner .bimg,.winner .halo,.winner svg,.pcard.sel,.namebox .caret{animation:none!important}
+  .nebula,.pulse,.title-tomato,.task.hurry,.winner .bimg,.winner .halo,.winner svg,.pcard.sel,.namebox .caret,.pbtn .plsvg,.rec-ring,.map-fig svg{animation:none!important}
   .screen{transition:opacity .2s ease,visibility 0s linear .2s;transform:none!important}
 }
 </style>
@@ -359,6 +401,8 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
       <button class="card" data-action="trio"><div class="ico many" id="ico-trio"></div><b>Zu dritt</b><span>20 Runden</span></button>
       <button class="card" data-action="quad"><div class="ico many" id="ico-quad"></div><b>Zu viert</b><span>20 Runden</span></button>
     </div>
+    <button class="card wide" data-action="journey"><div class="ico" id="ico-journey"></div>
+      <div class="wide-txt"><b>Planeten-Reise</b><span>Reihe für Reihe das Weltall erobern</span></div></button>
     <p class="hint">Zu zweit, dritt oder viert: iPad flach auf den Tisch legen. Je zwei Kinder sitzen an einer langen Seite.</p>
     <div class="menu-row">
       <button class="btn alt" data-action="profiles">Profile</button>
@@ -368,6 +412,7 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
   </section>
 
   <section class="screen" id="scr-pick"></section>
+  <section class="screen" id="scr-map"></section>
   <section class="screen" id="scr-profiles"></section>
   <section class="screen" id="scr-edit"></section>
   <section class="screen" id="scr-game"></section>
@@ -435,7 +480,7 @@ const Store = (() => {
         data = Object.assign(empty(), isObj(d) ? d : {});
         if (!Array.isArray(data.profiles)) data.profiles = [];
         data.profiles = data.profiles.filter(p => isObj(p) && p.id && typeof p.name === 'string')
-          .map(p => Object.assign({ fig: 'krone', best: 0 }, p, { pairs: isObj(p.pairs) ? p.pairs : {} }));
+          .map(p => Object.assign({ fig: 'krone', best: 0 }, p, { pairs: isObj(p.pairs) ? p.pairs : {}, planets: isObj(p.planets) ? p.planets : {} }));
       } else {
         // alte Fassung ohne Profile: nur die Ton-Einstellung übernehmen, Statistik verwerfen
         const old = localStorage.getItem(OLD_KEY);
@@ -448,7 +493,7 @@ const Store = (() => {
   const get = id => data.profiles.find(p => p.id === id) || null;
   function add(name, fig) {
     if (data.profiles.length >= MAX_PROFILES) return null;
-    const p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, fig, best: 0, pairs: {} };
+    const p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, fig, best: 0, pairs: {}, planets: {} };
     data.profiles.push(p); save(); return p;
   }
   function update(id, name, fig) { const p = get(id); if (p) { p.name = name; p.fig = fig; save(); } return p; }
@@ -549,8 +594,11 @@ const Logic = (() => {
 
   /** Runde: Aufgabe + gemischte Werte (genau ein richtiger). */
   function makeRound(rng = Math.random, opts = {}) {
-    const count = opts.count || randInt(rng, 6, 8);
     const { a, b } = makeTask(rng, opts.last);
+    return roundFor(a, b, opts.count || randInt(rng, 6, 8), rng);
+  }
+  /** Runde für eine vorgegebene Aufgabe a × b (z. B. in der Planeten-Reise). */
+  function roundFor(a, b, count, rng = Math.random) {
     const answer = a * b;
     const values = shuffle([answer, ...makeDistractors(a, b, count - 1, rng)], rng);
     return { a, b, answer, values, correctIndex: values.indexOf(answer) };
@@ -574,7 +622,62 @@ const Logic = (() => {
     }
     return { ok: fails.length === 0, fails: fails.slice(0, 20), checked: 100 * 3 * 5 + 500 };
   }
-  return { shuffle, candidates, makeDistractors, makeTask, makeRound, selfTest };
+  return { shuffle, candidates, makeDistractors, makeTask, makeRound, roundFor, selfTest };
+})();
+
+/* ---------------- Journey: Planeten-Reise (Missionen, Sterne, Empfehlung) ---------------- */
+const Journey = (() => {
+  // Lernreihenfolge: leichte Reihen zuerst, die 7er als großes Ziel am Ende (1er-Reihe bewusst nicht dabei)
+  const ROUTE = [10, 2, 5, 3, 4, 6, 9, 8, 7];
+  const FAST_MS = 3000, MISS_DAYS = 7;
+  const guest = { planets: {} };   // Gast: Fortschritt nur bis zum Neuladen
+  const prog = p => { const o = p || guest; if (!o.planets || typeof o.planets !== 'object') o.planets = {}; return o.planets; };
+  const stars = (p, row) => (prog(p)[row] || {}).stars || 0;
+  const unlocked = (p, row) => { const i = ROUTE.indexOf(row); return i <= 0 || stars(p, ROUTE[i - 1]) >= 1; };
+  const conqueredCount = p => ROUTE.filter(r => stars(p, r) >= 3).length;
+  const totalStars = p => ROUTE.reduce((s, r) => s + stars(p, r), 0);
+  /** zuletzt besuchter Planet (für die Position der Figur) */
+  function lastRow(p) {
+    let best = ROUTE[0], t = -1;
+    for (const r of ROUTE) { const e = prog(p)[r]; if (e && e.last > t) { t = e.last; best = r; } }
+    return best;
+  }
+  /** Mission: alle Aufgaben der Reihe (×2 … ×10, Richtung zufällig) + bis zu 2 Wiederholungen eroberter Planeten */
+  function mission(p, row) {
+    const tasks = Logic.shuffle([2, 3, 4, 5, 6, 7, 8, 9, 10]).map(k => Math.random() < .5 ? { a: row, b: k } : { a: k, b: row });
+    const won = Logic.shuffle(ROUTE.filter(r => r !== row && stars(p, r) >= 3));
+    won.slice(0, 2).forEach(r => {
+      const k = 2 + Math.floor(Math.random() * 9);
+      tasks.splice(2 + Math.floor(Math.random() * (tasks.length - 2)), 0, Math.random() < .5 ? { a: r, b: k } : { a: k, b: r });
+    });
+    return tasks;
+  }
+  /** 1 Stern: geschafft · 2: ohne Fehler · 3: ohne Fehler und jede Antwort ≤ 3 s */
+  const rate = ({ wrong, times }) => wrong ? 1 : times.every(ms => ms <= FAST_MS) ? 3 : 2;
+  function record(p, row, s) {
+    const e = prog(p)[row] || (prog(p)[row] = { stars: 0, visits: 0, last: 0 });
+    const before = e.stars;
+    e.stars = Math.max(e.stars, s); e.visits++; e.last = Date.now();
+    if (p) Store.save();
+    return { before, after: e.stars };
+  }
+  /** Empfehlung: knifflige Reihe (Statistik) → lange nicht besuchter eroberter Planet → nächster auf der Route */
+  function recommend(p) {
+    const open = ROUTE.filter(r => unlocked(p, r));
+    const todo = open.filter(r => stars(p, r) < 3);
+    if (p) {
+      const rows = Stats.rows(p);
+      const tricky = todo.map(r => rows[r - 1]).filter(x => x.enough && x.score >= .25).sort((a, b) => b.score - a.score)[0];
+      if (tricky) return { row: tricky.row, reason: 'tricky' };
+      const old = ROUTE.filter(r => stars(p, r) >= 3 && Date.now() - prog(p)[r].last > MISS_DAYS * 864e5)
+        .sort((a, b) => prog(p)[a].last - prog(p)[b].last)[0];
+      if (old) return { row: old, reason: 'missing' };
+    }
+    if (todo.length) return { row: todo[0], reason: 'next' };
+    const lastOf = r => (prog(p)[r] || {}).last || 0;
+    return { row: ROUTE.slice().sort((a, b) => lastOf(a) - lastOf(b))[0], reason: 'done' };
+  }
+  return { ROUTE, FAST_MS, stars, unlocked, conqueredCount, totalStars, lastRow, mission, rate, record, recommend };
 })();
 
 /* ---------------- Sound: synthetische Effekte mit Web Audio ---------------- */
@@ -905,7 +1008,41 @@ const Art = (() => {
     if (f.id === 'astro') inner = `<g transform="translate(50 57) scale(.78) translate(-50 -57)">${inner}</g>`;
     return `<svg class="figsvg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}${ACCESSORY[f.id] || ''}</svg>`;
   }
-  return { VARIETIES, FIGURES, figure, figureSVG, installDefs, tomatoSVG, basketSVG, sliceSVG, iconSVG };
+  /* ----- Planeten für die Planeten-Reise: jede Reihe ein eigener Planet ----- */
+  const PLANETS = {
+    2: { c: ['#c4f1ff', '#4cc3ff', '#1b5fa8'], deco: 'craters' },
+    3: { c: ['#dcffca', '#6fdc4a', '#2b7a1f'], deco: 'bands' },
+    4: { c: ['#ffe4b8', '#ffa23a', '#a8540f'], deco: 'craters' },
+    5: { c: ['#ffd8ec', '#ff6fb5', '#a32a6b'], deco: 'spots' },
+    6: { c: ['#e9deff', '#a98bff', '#5a3fb5'], deco: 'bands' },
+    7: { c: ['#f2cfff', '#b45cff', '#5b1f9e'], deco: 'bands', ring: '#ffd27a' },
+    8: { c: ['#ffd6cf', '#ff5a4a', '#9c1f16'], deco: 'craters' },
+    9: { c: ['#cefff6', '#3fd6c0', '#137a6c'], deco: 'spots', ring: '#c9fff6' },
+    10: { c: ['#fff7c9', '#ffd23f', '#c98a00'], deco: 'sun' },
+  };
+  function planetSVG(row) {
+    const p = PLANETS[row], id = 'pg' + row;
+    let s = `<svg class="plsvg" viewBox="-12 -12 124 124" xmlns="http://www.w3.org/2000/svg"><defs>
+      <radialGradient id="${id}" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="${p.c[0]}"/><stop offset=".55" stop-color="${p.c[1]}"/><stop offset="1" stop-color="${p.c[2]}"/></radialGradient>
+      <clipPath id="${id}c"><circle cx="50" cy="50" r="40"/></clipPath></defs>`;
+    if (p.deco === 'sun') for (let k = 0; k < 12; k++) {
+      const a = k * Math.PI / 6, r1 = 45, r2 = k % 2 ? 52 : 57;
+      s += `<path d="M${(50 + Math.cos(a) * r1).toFixed(1)} ${(50 + Math.sin(a) * r1).toFixed(1)}L${(50 + Math.cos(a) * r2).toFixed(1)} ${(50 + Math.sin(a) * r2).toFixed(1)}" stroke="${p.c[1]}" stroke-width="5" stroke-linecap="round"/>`;
+    }
+    if (p.ring) s += `<ellipse cx="50" cy="50" rx="60" ry="14" fill="none" stroke="${p.ring}" stroke-width="5" opacity=".75" transform="rotate(-16 50 50)"/>`;
+    s += `<circle cx="50" cy="50" r="40" fill="url(#${id})"/><g clip-path="url(#${id}c)">`;
+    if (p.deco === 'craters') for (const [x, y, r] of [[30, 62, 8], [62, 70, 6], [68, 36, 5], [44, 30, 4], [78, 56, 4]])
+      s += `<circle cx="${x}" cy="${y}" r="${r}" fill="${p.c[2]}" opacity=".35"/><circle cx="${x - 1}" cy="${y - 1}" r="${r * .6}" fill="${p.c[0]}" opacity=".2"/>`;
+    if (p.deco === 'bands') for (const [y, w] of [[30, 5], [44, 7], [60, 6], [74, 4]])
+      s += `<path d="M5 ${y}Q30 ${y - 6} 50 ${y}T95 ${y}" stroke="${p.c[0]}" stroke-width="${w}" fill="none" opacity=".35"/>`;
+    if (p.deco === 'spots') for (const [x, y, r] of [[34, 58, 9], [64, 34, 7], [66, 66, 5], [42, 32, 4]])
+      s += `<circle cx="${x}" cy="${y}" r="${r}" fill="${p.c[0]}" opacity=".35"/>`;
+    s += `</g><ellipse cx="34" cy="30" rx="11" ry="6" transform="rotate(-30 34 30)" fill="#fff" opacity=".35"/>`;
+    if (p.ring) s += `<path d="M-8 50A60 14 0 0 0 108 50" fill="none" stroke="${p.ring}" stroke-width="5" opacity=".9" transform="rotate(-16 50 50)"/>`;
+    s += `<text class="plnum" x="50" y="50" dy=".35em" text-anchor="middle" font-size="${row === 10 ? 34 : 42}">${row}</text></svg>`;
+    return s;
+  }
+  return { VARIETIES, FIGURES, figure, figureSVG, installDefs, tomatoSVG, basketSVG, sliceSVG, iconSVG, planetSVG };
 })();
 
 /* ---------------- FX: Partikel, Konfetti, Wackeln ---------------- */
@@ -982,6 +1119,7 @@ const Game = (() => {
      Index = Spielernummer - 1. Oben sitzende Spieler (rot 180) lesen alles auf dem Kopf stehend richtig. */
   const SLOTS = {
     solo: [{ x: 0, y: 0, w: 1, h: 1, rot: 0 }],
+    planet: [{ x: 0, y: 0, w: 1, h: 1, rot: 0 }],   // Planeten-Reise: wie Solo, aber feste Aufgabenliste
     duel: [{ x: 0, y: .5, w: 1, h: .5, rot: 0 }, { x: 0, y: 0, w: 1, h: .5, rot: 180 }],
     trio: [{ x: 0, y: .5, w: .5, h: .5, rot: 0 }, { x: .25, y: 0, w: .5, h: .5, rot: 180 }, { x: .5, y: .5, w: .5, h: .5, rot: 0 }],
     quad: [{ x: 0, y: .5, w: .5, h: .5, rot: 0 }, { x: .5, y: 0, w: .5, h: .5, rot: 180 },
@@ -1003,8 +1141,16 @@ const Game = (() => {
     return `<div class="who" data-p="${p}">${Art.figureSVG(prof ? prof.fig : null)}<span class="nm">${Util.esc(UI.displayName(prof, p, mode))}</span></div>`;
   };
   function buildDOM(mode) {
-    scr.classList.remove('solo', 'duel', 'trio', 'quad', 'multi'); scr.classList.add(mode);
-    if (mode === 'solo') {
+    scr.classList.remove('solo', 'duel', 'trio', 'quad', 'multi', 'planet'); scr.classList.add(mode);
+    if (mode === 'planet') {
+      scr.classList.add('solo');   // gleiches Layout wie Solo
+      const row = g.plan.row;
+      scr.innerHTML = `
+        <div class="bar solo-top"><div class="l planet-badge">${Art.planetSVG(row)}<span>${row}er-Planet</span></div>${taskHTML(false)}
+          <div class="r">Aufgabe&nbsp;<span class="rnd">1</span>/<span class="tot">${g.plan.total}</span></div></div>
+        <div class="field"></div>
+        <div class="bar"><div class="l"></div><div class="solo-mid">${whoHTML('solo', 0)}${basketHTML('solo', '#ffd54a', 0)}</div><div class="r"></div></div>`;
+    } else if (mode === 'solo') {
       scr.innerHTML = `
         <div class="bar solo-top"><div class="l"></div>${taskHTML(true)}<div class="r"><span class="timeleft">60</span>&nbsp;s</div></div>
         <div class="field"></div>
@@ -1027,7 +1173,7 @@ const Game = (() => {
     return {
       field, tlayer: scr.querySelector('#tlayer'), cdl: scr.querySelector('#cdl'),
       tasks: [...scr.querySelectorAll('.task')], rounds: [...scr.querySelectorAll('.rnd')],
-      timeEl: scr.querySelector('.timeleft'),
+      timeEl: scr.querySelector('.timeleft'), totEl: scr.querySelector('.tot'),
       baskets: SLOTS[mode].map((_, i) => scr.querySelector(`.basket[data-p="${i}"]`)),
     };
   }
@@ -1042,7 +1188,7 @@ const Game = (() => {
   function cells(n) {
     const F = g.F, slot = SLOTS[g.mode][0], sw = slot.w * F.w, sh = slot.h * F.h;
     let rows, cols, padX, padY;
-    if (g.mode === 'solo') {
+    if (g.n === 1) {
       const aspect = sw / sh;
       rows = aspect >= 1.15 ? 2 : aspect >= .75 ? 3 : 4; cols = Math.ceil(8 / rows); padX = 14; padY = 10;
     } else {
@@ -1120,8 +1266,9 @@ const Game = (() => {
   }
 
   /* ----- Ablauf ----- */
-  /** mode: 'solo' | 'duel' | 'trio' | 'quad'; profiles: [Profil | null (Gast), …] in Platz-Reihenfolge */
-  function start(mode, profiles = []) {
+  /** mode: 'solo' | 'planet' | 'duel' | 'trio' | 'quad'; profiles: [Profil | null (Gast), …] in Platz-Reihenfolge;
+      opts (nur 'planet'): { row, tasks: [{a, b}, …] } */
+  function start(mode, profiles = [], opts = {}) {
     gid++;
     if (g) g.over = true;
     FX.clear();
@@ -1130,6 +1277,9 @@ const Game = (() => {
       prof: SLOTS[mode].map((_, i) => profiles[i] || null),
       players: SLOTS[mode].map(() => ({ score: 0, shown: 0, wrong: 0, log: [] })),
       endAt: 0, lastTick: 99 };
+    // Planeten-Mission: Aufgabenliste; falsch beantwortete Aufgaben kommen einmal wieder dran
+    if (mode === 'planet') g.plan = { row: opts.row, queue: opts.tasks.slice(), total: opts.tasks.length,
+      wrong: 0, curWrong: false, retried: new Set(), wrongTasks: [], times: [] };
     g.dom = buildDOM(mode);
     measure();
     Pwa.wake(true);
@@ -1160,8 +1310,15 @@ const Game = (() => {
   function nextRound() {
     if (!g.running) return;
     if (g.n > 1 && g.round >= ROUNDS) return finish();
+    let r;
+    if (g.mode === 'planet') {
+      if (!g.plan.queue.length) return finish();
+      const t = g.plan.queue.shift();
+      g.plan.curWrong = false;
+      r = Logic.roundFor(t.a, t.b, Math.random() < .5 ? 6 : 7);
+      if (g.dom.totEl) g.dom.totEl.textContent = g.plan.total;
+    } else r = Logic.makeRound(Math.random, { count: g.n > 1 ? 6 : 0, last: g.task });
     g.round++;
-    const r = Logic.makeRound(Math.random, { count: g.n > 1 ? 6 : 0, last: g.task });
     g.task = r;
     showTask(r);
     spawn(r);
@@ -1187,7 +1344,12 @@ const Game = (() => {
     g.running = false; g.over = true;
     Pwa.wake(false);
     let res;
-    if (g.mode === 'solo') {
+    if (g.mode === 'planet') {
+      const P = g.plan, prof = g.prof[0], s = Journey.rate({ wrong: P.wrong, times: P.times });
+      const { before, after } = Journey.record(prof, P.row, s);
+      res = { mode: 'planet', players: g.prof, row: P.row, stars: s, before, after, wrongTasks: P.wrongTasks,
+        allConquered: before < 3 && after >= 3 && Journey.conqueredCount(prof) === Journey.ROUTE.length };
+    } else if (g.mode === 'solo') {
       const p1 = g.players[0], prof = g.prof[0], prev = prof ? prof.best || 0 : 0, newBest = !!prof && p1.score > prev;
       if (newBest) { prof.best = p1.score; Store.save(); }  // Rekord nur mit Profil
       const hits = p1.log.filter(l => l.correct);
@@ -1232,6 +1394,7 @@ const Game = (() => {
     const r = g.task, ms = now - g.roundT0, P = g.players[player];
     P.score++; P.log.push({ a: r.a, b: r.b, correct: true, ms });
     Stats.record(g.prof[player], r.a, r.b, true, ms);
+    if (g.plan) g.plan.times.push(ms - t.delay);   // ab dem Erscheinen der richtigen Tomate
     t.state = 'pick'; t.t0 = now; t.owner = player; t.el.style.zIndex = 10;
     Sound.pluck();
     FX.burst(t.cx, t.cy, Util.reducedMotion ? 2 : 8);
@@ -1242,13 +1405,27 @@ const Game = (() => {
         o.leaveDir = o.mir;
       }
     }
-    if (g.n > 1 || performance.now() < g.endAt) later(nextRound, NEXT_DELAY);
+    if (g.mode !== 'solo' || performance.now() < g.endAt) later(nextRound, NEXT_DELAY);
   }
   function hitWrong(t, player, now) {
     if (t.state === 'rot') return;
     const r = g.task, P = g.players[player];
     P.wrong++; P.log.push({ a: r.a, b: r.b, correct: false, ms: now - g.roundT0, value: t.value });
     Stats.record(g.prof[player], r.a, r.b, false, 0);
+    if (g.plan) {
+      const P = g.plan, key = Math.min(r.a, r.b) + '×' + Math.max(r.a, r.b);
+      P.wrong++;
+      if (!P.curWrong) {
+        P.curWrong = true;
+        if (!P.wrongTasks.includes(`${r.a} × ${r.b}`)) P.wrongTasks.push(`${r.a} × ${r.b}`);
+        if (!P.retried.has(key)) {   // diese Aufgabe kommt etwas später noch einmal dran
+          P.retried.add(key);
+          P.queue.splice(Math.min(2, P.queue.length), 0, { a: r.a, b: r.b });
+          P.total++;
+          if (g.dom.totEl) g.dom.totEl.textContent = P.total;
+        }
+      }
+    }
     t.state = 'rot'; t.t0 = now;
     t.fallDir = t.mir;   // fällt "nach unten" aus Sicht des Spielers
     t.spin = Math.random() < .5 ? -1 : 1;
@@ -1366,12 +1543,12 @@ const Game = (() => {
 /* ---------------- UI: Zustandsautomat für Bildschirme ---------------- */
 const UI = (() => {
   const S = {};
-  for (const k of ['start', 'menu', 'pick', 'profiles', 'edit', 'game', 'result', 'stats']) S[k] = document.getElementById('scr-' + k);
+  for (const k of ['start', 'menu', 'pick', 'map', 'profiles', 'edit', 'game', 'result', 'stats']) S[k] = document.getElementById('scr-' + k);
   // erlaubte Übergänge
   const FLOW = {
-    start: ['menu'], menu: ['pick', 'stats', 'profiles'], pick: ['game', 'menu', 'edit'],
-    profiles: ['menu', 'edit'], edit: ['profiles', 'pick'], game: ['result', 'menu'],
-    result: ['game', 'menu'], stats: ['menu'],
+    start: ['menu'], menu: ['pick', 'stats', 'profiles'], pick: ['game', 'menu', 'edit', 'map'],
+    map: ['game', 'menu'], profiles: ['menu', 'edit'], edit: ['profiles', 'pick'], game: ['result', 'menu', 'map'],
+    result: ['game', 'menu', 'map'], stats: ['menu'],
   };
   let current = 'start';
   let last = { mode: 'solo', players: [null, null] }; // für „Nochmal“
@@ -1422,7 +1599,8 @@ const UI = (() => {
     Game.pause();
     dialog(title, text, [
       { label: 'Weiterspielen', fn: () => Game.resume() },
-      { label: 'Beenden', cls: 'danger', fn: () => { Game.quit(); go('menu'); } }], Game.mode !== 'solo');
+      { label: 'Beenden', cls: 'danger', fn: () => { const back = Game.mode === 'planet' ? 'map' : 'menu'; Game.quit(); if (back === 'map') renderMap(); go(back); } }],
+      Game.SLOTS[Game.mode].length > 1);
   }
 
   /* ----- Profil-Karte (Figur + Name) ----- */
@@ -1435,9 +1613,9 @@ const UI = (() => {
   const pickTitle = (slot) => pick.sel[slot] ? 'Bereit! Warte auf die anderen …' : 'Wer sitzt hier?';
   function renderPick() {
     const el = S.pick, profs = Store.profiles;
-    if (pick.mode === 'solo') {
+    if (pick.n === 1) {   // Solo und Planeten-Reise
       el.classList.remove('duelpick', 'many');
-      el.innerHTML = `<div class="pick-head"><button class="btn ghost" data-action="menu">‹ Zurück</button><h2>Wer spielt?</h2></div>
+      el.innerHTML = `<div class="pick-head"><button class="btn ghost" data-action="menu">‹ Zurück</button><h2>${pick.mode === 'planet' ? 'Wer reist ins All?' : 'Wer spielt?'}</h2></div>
         <div class="pick-grid">
           ${profs.map(p => card(p, `data-action="pickp" data-id="${p.id}" data-side="0"`)).join('')}
           ${card(null, 'data-action="pickp" data-id="guest" data-side="0"', 'guest')}
@@ -1475,6 +1653,7 @@ const UI = (() => {
   function pickProfile(id, slot) {
     const prof = id === 'guest' ? null : Store.get(id);
     if (pick.mode === 'solo') return startGame('solo', [prof]);
+    if (pick.mode === 'planet') return openMap(prof);
     if (id !== 'guest' && pick.sel.some((s, i) => i !== slot && s === id)) return; // jedes Profil nur einmal
     pick.sel[slot] = pick.sel[slot] === id ? undefined : id;                     // nochmal tippen = abwählen
     updatePick();
@@ -1562,6 +1741,80 @@ const UI = (() => {
     if (from === 'pick' && pick) { renderPick(); go('pick'); } else go('profiles');
   }
 
+  /* ----- Planeten-Reise: Sternenkarte ----- */
+  // Positionen (in % der Kartenfläche) entlang der Route: Schlangenlinie von oben links bis zum 7er-Planeten unten rechts
+  const MAP_POS = [[14, 22], [42, 15], [74, 22], [86, 52], [57, 57], [28, 50], [13, 82], [43, 86], [76, 80]];
+  const FLAG = '<svg class="flag" viewBox="0 0 30 40"><path d="M4 38V4" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M5 5L26 11L5 18Z" fill="#ffd54a" stroke="#c98a00" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+  const LOCK = '<svg class="lock" viewBox="0 0 24 28"><path d="M6 13V8a6 6 0 0 1 12 0v5" fill="none" stroke="#fff" stroke-width="3"/><rect x="3" y="12" width="18" height="14" rx="3" fill="#fff"/></svg>';
+  const genitive = name => /[sßxz]$/i.test(name) ? name + '’' : name + 's';   // „Lenas“, „Max’“
+  let journeyProf = null;   // Profil der laufenden Reise (null = Gast)
+  function openMap(prof) { journeyProf = prof; renderMap(); go('map'); }
+  function recText(rec, p) {
+    const r = rec.row, st = Journey.stars(p, r);
+    let t = rec.reason === 'tricky' ? `Heute empfohlen: der ${r}er-Planet. Da wird es noch knifflig!`
+      : rec.reason === 'missing' ? `Der ${r}er-Planet vermisst dich! Schau mal wieder vorbei.`
+      : rec.reason === 'done' ? `Alle Planeten erobert! Halte sie frisch und besuch den ${r}er-Planeten.`
+      : st ? `Hol dir den nächsten Stern auf dem ${r}er-Planeten!` : `Auf zum ${r}er-Planeten!`;
+    if (!p) t += ' Als Gast wird die Reise nicht gespeichert.';
+    return t;
+  }
+  function renderMap() {
+    const p = journeyProf, R = Journey.ROUTE, rec = Journey.recommend(p), here = R.indexOf(Journey.lastRow(p));
+    const won = Journey.conqueredCount(p);
+    const reachedIdx = R.reduce((m, r, i) => Journey.unlocked(p, r) ? i : m, 0);
+    const line = n => MAP_POS.slice(0, n).map(xy => xy.join(',')).join(' ');
+    const planets = R.map((row, i) => {
+      const st = Journey.stars(p, row), open = Journey.unlocked(p, row);
+      const cls = ['pbtn', open ? '' : 'locked', st >= 3 ? 'won' : '', row === rec.row ? 'rec' : '', row === 7 ? 'big' : ''].join(' ');
+      return `<button class="${cls}" data-action="planet" data-row="${row}" style="left:${MAP_POS[i][0]}%;top:${MAP_POS[i][1]}%"
+          aria-label="${row}er-Planet, ${st} von 3 Sternen${open ? '' : ', noch gesperrt'}">
+        ${row === rec.row ? '<span class="rec-ring"></span><span class="rec-tag">Heute empfohlen</span>' : ''}
+        ${Art.planetSVG(row)}${st >= 3 ? FLAG : ''}${open ? '' : LOCK}
+        <span class="pl-stars">${[1, 2, 3].map(k => `<i class="${k <= st ? 'on' : ''}">★</i>`).join('')}</span></button>`;
+    }).join('');
+    S.map.innerHTML = `<div class="map-head"><button class="btn ghost" data-action="menu">‹ Zurück</button>
+        <h2>${p ? esc(genitive(p.name)) : 'Deine'} Sternenkarte</h2>
+        <span class="map-prog">${won === R.length ? '🏅 Einmaleins-Astronaut · ' : ''}${won} von ${R.length} erobert · ${Journey.totalStars(p)} ★</span></div>
+      <div class="map-area">
+        <svg class="route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <polyline points="${line(R.length)}" class="r-all"/><polyline points="${line(reachedIdx + 1)}" class="r-done"/></svg>
+        ${planets}
+        <div class="map-fig" style="left:${MAP_POS[here][0]}%;top:${MAP_POS[here][1]}%">${Art.figureSVG(p ? p.fig : null)}</div>
+      </div>
+      <div class="tip map-tip">${Art.figureSVG(p ? p.fig : null)}<span id="map-msg">${recText(rec, p)}</span></div>`;
+  }
+  function startMission(row) {
+    last = { mode: 'planet', players: [journeyProf], row };
+    go('game');
+    Game.start('planet', [journeyProf], { row, tasks: Journey.mission(journeyProf, row) });
+  }
+  function showPlanetResult(res) {
+    const el = S.result, p = res.players[0], s = res.stars, row = res.row;
+    el.classList.remove('duelres', 'many');
+    const conquered = res.before < 3 && res.after >= 3;
+    const head = s === 3 ? withName('Blitzschnell', p) + '!' : s === 2 ? withName('Ohne Fehler', p) + '!' : withName('Mission geschafft', p) + '!';
+    const line = res.allConquered ? 'Alle Planeten erobert! Du bist jetzt Einmaleins-Astronaut! 🏅'
+      : conquered ? `Der ${row}er-Planet ist erobert! 🚩`
+      : s === 1 ? 'Für den 2. Stern: die Mission ohne Fehler schaffen.'
+      : s === 2 ? 'Für den 3. Stern: ohne Fehler und jede Antwort in unter 3 Sekunden.'
+      : 'Wieder alle 3 Sterne. Stark!';
+    const newStar = res.after > res.before && !conquered ? `<p class="res-line rec">Neuer Stern! Jetzt ${res.after} von 3.</p>` : '';
+    const hard = res.wrongTasks.length ? `<p class="res-line">Knifflig waren: ${res.wrongTasks.slice(0, 4).join(' · ')}</p>` : '';
+    el.innerHTML = `<div class="res-solo planet-res">
+      <p class="res-big">${head}</p>
+      <div class="pr-row"><span class="res-fig ${s === 3 ? 'winner' : ''}">${Art.figureSVG(p ? p.fig : null)}</span>${Art.planetSVG(row)}</div>
+      <div class="pr-stars">${[1, 2, 3].map(() => '<i>★</i>').join('')}</div>
+      <p class="res-line ${res.after >= 3 ? 'rec' : ''}">${line}</p>${newStar}${hard}
+      <div class="menu-row"><button class="btn big" data-action="again">Nochmal</button><button class="btn ghost" data-action="tomap">Zur Sternenkarte</button></div></div>`;
+    go('result');
+    // Sterne nacheinander aufleuchten lassen
+    el.querySelectorAll('.pr-stars i').forEach((st, i) => {
+      if (i < s) setTimeout(() => { if (current !== 'result') return; st.classList.add('on'); FX.bump(st, 1.7); Sound.land(); }, 500 + i * 450);
+    });
+    setTimeout(() => { if (current === 'result') Sound.jingle(); }, 600 + s * 450);
+    if (conquered || s === 3) FX.confetti('rain');
+  }
+
   /* ----- Aktionen ----- */
   function startGame(mode, players) {
     last = { mode, players };
@@ -1574,7 +1827,22 @@ const UI = (() => {
     duel() { openPick('duel'); },
     trio() { openPick('trio'); },
     quad() { openPick('quad'); },
-    again() { startGame(last.mode, last.players.map(p => p && Store.get(p.id))); }, // gelöschtes Profil → Gast
+    again() {
+      if (last.mode === 'planet') { const p0 = last.players[0]; journeyProf = p0 ? Store.get(p0.id) : null; return startMission(last.row); }
+      startGame(last.mode, last.players.map(p => p && Store.get(p.id)));   // gelöschtes Profil → Gast
+    },
+    journey() { openPick('planet'); },
+    tomap() { renderMap(); go('map'); },
+    planet(b) {
+      const row = +b.dataset.row;
+      if (!Journey.unlocked(journeyProf, row)) {
+        const prev = Journey.ROUTE[Journey.ROUTE.indexOf(row) - 1];
+        FX.shake(b);
+        document.getElementById('map-msg').textContent = `Der ${row}er-Planet wird frei, sobald du auf dem ${prev}er-Planeten einen Stern hast.`;
+        return;
+      }
+      startMission(row);
+    },
     menu() { if (current === 'game') Game.quit(); FX.clear(); go('menu'); },
     stats() { go('stats'); },
     profiles() { go('profiles'); },
@@ -1617,6 +1885,7 @@ const UI = (() => {
 
   /* ----- Ergebnis ----- */
   function showResult(res) {
+    if (res.mode === 'planet') return showPlanetResult(res);
     const el = S.result;
     if (res.mode === 'solo') {
       el.classList.remove('duelres');
@@ -1817,6 +2086,7 @@ const Pwa = (() => {
   document.getElementById('ico-solo').innerHTML = Art.tomatoSVG(V[2], null);
   document.getElementById('ico-duel').innerHTML = Art.tomatoSVG(V[5], null) + Art.tomatoSVG(V[3], null);
   document.getElementById('ico-trio').innerHTML = [V[0], V[1], V[8]].map(v => Art.tomatoSVG(v, null)).join('');
+  document.getElementById('ico-journey').innerHTML = [2, 7, 10].map(r => Art.planetSVG(r)).join('');
   document.getElementById('ico-quad').innerHTML = [V[7], V[3], V[2], V[4]].map(v => Art.tomatoSVG(v, null)).join('');
   Pwa.registerSW();
   Pwa.guards();
