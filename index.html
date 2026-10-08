@@ -364,6 +364,10 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .map-fig{position:absolute;width:clamp(44px,7vmin,66px);translate:-50% -118%;pointer-events:none;z-index:2}
 .map-fig svg{width:100%;height:auto;overflow:visible;animation:bob 2.4s ease-in-out infinite}
 .map-tip{max-width:1100px;font-size:clamp(17px,2.2vw,24px)}
+.tip-col{display:flex;flex-direction:column;gap:2px;min-width:0}
+.suit-next{font-size:clamp(14px,1.7vw,18px);color:var(--muted);font-weight:800}
+.res-line.suit-new{color:var(--p1)}
+.figsvg{overflow:visible}
 .planet-badge{margin-left:64px;gap:8px;font-weight:900;font-size:clamp(16px,2vw,22px);color:#fff}
 .planet-badge .plsvg{width:clamp(58px,9vh,80px);height:clamp(58px,9vh,80px);flex:0 0 auto}
 #scr-game.planet .task{background:rgba(20,8,50,.55);border-radius:999px;box-shadow:0 0 0 3px rgba(255,255,255,.15) inset}
@@ -1001,13 +1005,48 @@ const Art = (() => {
       <path d="M29 35L36 31M59 35L66 31" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity=".45"/></g>
     ${star(87, 14, 6, '#ffd23f')}${star(12, 20, 4.5, '#ffd23f')}${star(93, 68, 4, '#fff3b0')}${star(6, 74, 3.5, '#ff9ad0')}`;
   const figure = id => FIGURES.find(f => f.id === id) || GUEST_FIG;
-  /** Figur als SVG (nutzt die globalen <defs>). id unbekannt/null → Gast-Tomate. */
-  function figureSVG(id) {
+  /* ----- Astronauten-Anzug: pro erobertem Planeten ein Teil mehr (Stufe 0–9) ----- */
+  const SUIT_NAMES = ['Mission-Abzeichen', 'Funk-Headset', 'Werkzeuggürtel', 'Handschuhe', 'Raumstiefel',
+    'Jetpack', 'Raumanzug', 'Helm', 'Goldener Sternenglanz'];
+  const SUIT_WHITE = '#f4f7fb', SUIT_LINE = '#b9c4d6';
+  const glove = (x, dir) => `<rect x="${x - dir * 7 - 3}" y="58" width="6" height="12" rx="2" fill="#dfe6f0"/>
+    <ellipse cx="${x}" cy="64" rx="7" ry="6.5" fill="${SUIT_WHITE}" stroke="${SUIT_LINE}" stroke-width="1.5"/>
+    <ellipse cx="${x + dir * 3}" cy="57.5" rx="2.6" ry="3.4" fill="${SUIT_WHITE}" stroke="${SUIT_LINE}" stroke-width="1.2"/>`;
+  const boot = x => `<rect x="${x}" y="90" width="18" height="9" rx="4" fill="${SUIT_WHITE}" stroke="${SUIT_LINE}" stroke-width="1.5"/>
+    <rect x="${x + 1}" y="96.5" width="16" height="3.5" rx="1.7" fill="#8d9ab3"/>`;
+  const tank = x => `<rect x="${x}" y="34" width="13" height="40" rx="6" fill="#c9d3e3" stroke="#8d9ab3" stroke-width="1.5"/>
+    <rect x="${x + 3}" y="73" width="7" height="5" rx="1.5" fill="#5f6b82"/><path d="M${x + 4} 78L${x + 6.5} 86L${x + 9} 78Z" fill="#ffb347"/>`;
+  /** Teile hinter der Tomate (Stufe ≥ n) */
+  const suitBack = lvl => (lvl >= 9 ? `<circle cx="50" cy="56" r="48" fill="#ffd54a" opacity=".16"/>${Array.from({ length: 12 }, (_, k) => {
+      const a = k * Math.PI / 6, c = Math.cos(a), s = Math.sin(a);
+      return `<path d="M${(50 + c * 46).toFixed(1)} ${(56 + s * 46).toFixed(1)}L${(50 + c * 55).toFixed(1)} ${(56 + s * 55).toFixed(1)}" stroke="#ffd54a" stroke-width="3" stroke-linecap="round" opacity=".8"/>`;
+    }).join('')}` : '') + (lvl >= 6 ? tank(3) + tank(84) : '');
+  /** Teile vor der Tomate, unter dem Accessoire */
+  const suitFront = (lvl, v) => (lvl >= 7 ? `<g clip-path="url(#tc-${v.id})"><rect x="0" y="79" width="100" height="25" fill="${SUIT_WHITE}"/>
+      <path d="M0 79Q50 87 100 79" stroke="${SUIT_LINE}" stroke-width="2.5" fill="none"/><path d="M50 84V100" stroke="${SUIT_LINE}" stroke-width="1.5"/></g>` : '')
+    + (lvl >= 3 ? `<g clip-path="url(#tc-${v.id})"><path d="M0 83Q50 95 100 83" stroke="#5f6b82" stroke-width="6" fill="none"/></g>
+      <rect x="45" y="85" width="10" height="7" rx="1.5" fill="#ffd54a" stroke="#c98a00" stroke-width="1.2"/>` : '')
+    + (lvl >= 1 ? `<circle cx="74" cy="76" r="6.5" fill="#1b2a6b" stroke="#ffd54a" stroke-width="1.6"/>${star(74, 76, 3.8, '#ffd54a')}` : '')
+    + (lvl >= 2 ? `<circle cx="13" cy="50" r="5.5" fill="#4a5568"/><path d="M15 54Q19 70 34 71" stroke="#4a5568" stroke-width="2" fill="none"/>
+      <circle cx="35" cy="71" r="2.6" fill="#2c2c44"/>` : '')
+    + (lvl >= 4 ? glove(7, -1) + glove(93, 1) : '')
+    + (lvl >= 5 ? boot(26) + boot(56) : '');
+  /** Teile über allem (Helm) */
+  const suitTop = (lvl, f) => lvl < 8 ? '' : f.id === 'astro'
+    ? '<path d="M8 54A42 42 0 0 1 92 54" stroke="#ffd54a" stroke-width="4" fill="none" opacity=".9"/>'   // Astro hat schon einen Helm: goldenes Visier
+    : `<circle cx="50" cy="52" r="50" fill="rgba(170,210,255,.12)" stroke="#dfeaff" stroke-width="3"/>
+      <path d="M16 32Q26 10 50 5" stroke="#fff" stroke-width="3.5" fill="none" opacity=".7" stroke-linecap="round"/>
+      <path d="M17 94Q50 107 83 94" stroke="#cfd8e8" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+
+  /** Figur als SVG (nutzt die globalen <defs>). id unbekannt/null → Gast-Tomate. suit = Anzug-Stufe 0–9. */
+  function figureSVG(id, suit = 0) {
     const f = figure(id), v = VARIETIES.find(x => x.id === f.variety);
-    let inner = tomatoSVG(v, null).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + FACE;
+    let inner = suitBack(suit) + tomatoSVG(v, null).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + FACE + suitFront(suit, v);
     if (f.id === 'astro') inner = `<g transform="translate(50 57) scale(.78) translate(-50 -57)">${inner}</g>`;
-    return `<svg class="figsvg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}${ACCESSORY[f.id] || ''}</svg>`;
+    return `<svg class="figsvg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}${ACCESSORY[f.id] || ''}${suitTop(suit, f)}</svg>`;
   }
+  /** Figur eines Profils mit seinem Anzug (Gast: ohne Anzug, außer suit wird übergeben) */
+  const figureOf = (p, suit) => figureSVG(p ? p.fig : null, suit != null ? suit : p ? Journey.conqueredCount(p) : 0);
   /* ----- Planeten für die Planeten-Reise: jede Reihe ein eigener Planet ----- */
   const PLANETS = {
     2: { c: ['#c4f1ff', '#4cc3ff', '#1b5fa8'], deco: 'craters' },
@@ -1042,7 +1081,7 @@ const Art = (() => {
     s += `<text class="plnum" x="50" y="50" dy=".35em" text-anchor="middle" font-size="${row === 10 ? 34 : 42}">${row}</text></svg>`;
     return s;
   }
-  return { VARIETIES, FIGURES, figure, figureSVG, installDefs, tomatoSVG, basketSVG, sliceSVG, iconSVG, planetSVG };
+  return { VARIETIES, FIGURES, SUIT_NAMES, figure, figureSVG, figureOf, installDefs, tomatoSVG, basketSVG, sliceSVG, iconSVG, planetSVG };
 })();
 
 /* ---------------- FX: Partikel, Konfetti, Wackeln ---------------- */
@@ -1138,7 +1177,7 @@ const Game = (() => {
   /** Figur + Name des Spielers neben dem Korb */
   const whoHTML = (mode, p) => {
     const prof = g.prof[p];
-    return `<div class="who" data-p="${p}">${Art.figureSVG(prof ? prof.fig : null)}<span class="nm">${Util.esc(UI.displayName(prof, p, mode))}</span></div>`;
+    return `<div class="who" data-p="${p}">${Art.figureOf(prof)}<span class="nm">${Util.esc(UI.displayName(prof, p, mode))}</span></div>`;
   };
   function buildDOM(mode) {
     scr.classList.remove('solo', 'duel', 'trio', 'quad', 'multi', 'planet'); scr.classList.add(mode);
@@ -1605,7 +1644,7 @@ const UI = (() => {
 
   /* ----- Profil-Karte (Figur + Name) ----- */
   const card = (p, attrs, cls = '') =>
-    `<button class="pcard ${cls}" ${attrs}>${Art.figureSVG(p ? p.fig : null)}<span class="nm">${p ? esc(p.name) : 'Gast'}</span></button>`;
+    `<button class="pcard ${cls}" ${attrs}>${Art.figureOf(p)}<span class="nm">${p ? esc(p.name) : 'Gast'}</span></button>`;
 
   /* ----- „Wer spielt?“ ----- */
   let pick = null; // { mode, n, sel: [id | 'guest' | undefined, …] (Index = Platz) }
@@ -1671,7 +1710,7 @@ const UI = (() => {
   function renderProfiles() {
     const profs = Store.profiles;
     S.profiles.innerHTML = `<div class="stats-head"><button class="btn ghost" data-action="menu">‹ Zurück</button><h2>Profile</h2></div>
-      <div class="scroll plist">${profs.map(p => `<div class="prow">${Art.figureSVG(p.fig)}
+      <div class="scroll plist">${profs.map(p => `<div class="prow">${Art.figureOf(p)}
           <span class="nm">${esc(p.name)}</span><span class="rec">Rekord: ${p.best}</span>
           <button class="btn ghost small" data-action="editp" data-id="${p.id}">Ändern</button>
           <button class="btn danger small" data-action="delp" data-id="${p.id}">Löschen</button></div>`).join('')
@@ -1779,9 +1818,11 @@ const UI = (() => {
         <svg class="route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           <polyline points="${line(R.length)}" class="r-all"/><polyline points="${line(reachedIdx + 1)}" class="r-done"/></svg>
         ${planets}
-        <div class="map-fig" style="left:${MAP_POS[here][0]}%;top:${MAP_POS[here][1]}%">${Art.figureSVG(p ? p.fig : null)}</div>
+        <div class="map-fig" style="left:${MAP_POS[here][0]}%;top:${MAP_POS[here][1]}%">${Art.figureOf(p, Journey.conqueredCount(p))}</div>
       </div>
-      <div class="tip map-tip">${Art.figureSVG(p ? p.fig : null)}<span id="map-msg">${recText(rec, p)}</span></div>`;
+      <div class="tip map-tip">${Art.figureOf(p, won)}<div class="tip-col"><span id="map-msg">${recText(rec, p)}</span>
+        ${won < R.length ? `<span class="suit-next">🧑‍🚀 Nächstes Anzug-Teil: ${Art.SUIT_NAMES[won]} (Anzug ${won}/${R.length})</span>`
+          : '<span class="suit-next">🧑‍🚀 Dein Astronauten-Anzug ist komplett!</span>'}</div></div>`;
   }
   function startMission(row) {
     last = { mode: 'planet', players: [journeyProf], row };
@@ -1798,11 +1839,12 @@ const UI = (() => {
       : s === 1 ? 'Für den 2. Stern: die Mission ohne Fehler schaffen.'
       : s === 2 ? 'Für den 3. Stern: ohne Fehler und jede Antwort in unter 3 Sekunden.'
       : 'Wieder alle 3 Sterne. Stark!';
-    const newStar = res.after > res.before && !conquered ? `<p class="res-line rec">Neuer Stern! Jetzt ${res.after} von 3.</p>` : '';
+    const newStar = res.after > res.before && !conquered ? `<p class="res-line rec">Neuer Stern! Jetzt ${res.after} von 3.</p>`
+      : conquered ? `<p class="res-line suit-new">🧑‍🚀 Neues Anzug-Teil: ${Art.SUIT_NAMES[Journey.conqueredCount(p) - 1]}!</p>` : '';
     const hard = res.wrongTasks.length ? `<p class="res-line">Knifflig waren: ${res.wrongTasks.slice(0, 4).join(' · ')}</p>` : '';
     el.innerHTML = `<div class="res-solo planet-res">
       <p class="res-big">${head}</p>
-      <div class="pr-row"><span class="res-fig ${s === 3 ? 'winner' : ''}">${Art.figureSVG(p ? p.fig : null)}</span>${Art.planetSVG(row)}</div>
+      <div class="pr-row"><span class="res-fig ${s === 3 || conquered ? 'winner' : ''}">${Art.figureOf(p, Journey.conqueredCount(p))}</span>${Art.planetSVG(row)}</div>
       <div class="pr-stars">${[1, 2, 3].map(() => '<i>★</i>').join('')}</div>
       <p class="res-line ${res.after >= 3 ? 'rec' : ''}">${line}</p>${newStar}${hard}
       <div class="menu-row"><button class="btn big" data-action="again">Nochmal</button><button class="btn ghost" data-action="tomap">Zur Sternenkarte</button></div></div>`;
@@ -1896,7 +1938,7 @@ const UI = (() => {
         : res.newBest ? 'Neuer Rekord! 🎉' : 'Dein Rekord: ' + res.best;
       el.innerHTML = `<div class="res-solo">
         <p class="res-big">${head}</p>
-        <div class="res-count"><span class="res-fig ${res.newBest ? 'winner' : ''}">${Art.figureSVG(p ? p.fig : null)}</span>${Art.basketSVG('#ffd54a')}<span class="cnt">0</span></div>
+        <div class="res-count"><span class="res-fig ${res.newBest ? 'winner' : ''}">${Art.figureOf(p)}</span>${Art.basketSVG('#ffd54a')}<span class="cnt">0</span></div>
         <p class="res-line ${res.newBest ? 'rec' : ''}">${recLine}</p>
         ${res.avgMs ? `<p class="res-line">Im Schnitt ${fmtS(res.avgMs)} Sekunden pro Tomate</p>` : ''}
         <div class="menu-row"><button class="btn big" data-action="again">Nochmal</button><button class="btn ghost" data-action="menu">Zum Menü</button></div></div>`;
@@ -1927,7 +1969,7 @@ const UI = (() => {
         return `<div class="res-panel" style="width:${s.w * 100}%">
           <p class="head">${head}</p>
           <div class="basket p${i + 1} ${win ? 'winner' : ''}"><div class="halo"></div>
-            <div class="who">${Art.figureSVG(me ? me.fig : null)}</div>${Art.basketSVG(Game.COLORS[i])}<div class="score">${mine}</div></div>
+            <div class="who">${Art.figureOf(me)}</div>${Art.basketSVG(Game.COLORS[i])}<div class="score">${mine}</div></div>
           <p class="sub">${sub}</p></div>`;
       };
       const half = isTop => `<div class="res-half ${isTop ? 'top' : ''}">
@@ -1950,7 +1992,7 @@ const UI = (() => {
     }
     const prof = Store.get(statsSel);
     document.getElementById('stats-chips').innerHTML = profs.map(p =>
-      `<button class="chip ${p.id === statsSel ? 'sel' : ''}" data-action="statsp" data-id="${p.id}">${Art.figureSVG(p.fig)}<span>${esc(p.name)}</span></button>`).join('');
+      `<button class="chip ${p.id === statsSel ? 'sel' : ''}" data-action="statsp" data-id="${p.id}">${Art.figureOf(p)}<span>${esc(p.name)}</span></button>`).join('');
     document.querySelector('#scr-stats [data-action="reset"]').style.visibility = prof ? 'visible' : 'hidden';
     const rows = Stats.rows(prof);
     const played = rows.filter(r => r.n > 0);
@@ -1965,7 +2007,7 @@ const UI = (() => {
       const names = hard.map(r => r.row + 'er');
       tip = `Die ${names.slice(0, -1).map(n => n + '-').join(', die ')} und die ${names[names.length - 1]}-Reihe sind noch knifflig!`;
     }
-    document.getElementById('stats-tip').innerHTML = Art.figureSVG(prof ? prof.fig : null) + `<span>${tip}</span>`;
+    document.getElementById('stats-tip').innerHTML = Art.figureOf(prof) + `<span>${tip}</span>`;
     const sorted = [...played].sort((a, b) => b.score - a.score || a.row - b.row).concat(rows.filter(r => r.n === 0));
     const list = document.getElementById('stats-list');
     list.innerHTML = sorted.map(r => {
