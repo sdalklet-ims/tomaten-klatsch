@@ -77,6 +77,19 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 
 /* ---------- Menü ---------- */
 .menu-title{margin:0;font-size:clamp(28px,4.4vw,48px);font-weight:900;text-align:center;text-shadow:0 0 18px rgba(170,120,255,.6)}
+#scr-menu{gap:clamp(10px,2.2vh,24px)}
+.topic-switch{display:flex;gap:4px;padding:5px;border-radius:999px;background:rgba(255,255,255,.1);box-shadow:0 0 0 2px rgba(255,255,255,.18) inset}
+.tsw{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:900;font-size:clamp(17px,2.1vw,22px);padding:.45em 1.2em;border-radius:999px;
+  background:transparent;color:var(--muted);min-height:48px;transition:transform .12s;touch-action:manipulation}
+.tsw.on{background:linear-gradient(#ffe36e,#ffad1f);color:#3a1206;box-shadow:0 3px 0 #b8670a}
+.tsw.pressed{transform:scale(.95)}
+.extra-row{display:flex;gap:clamp(10px,2vw,20px);flex-wrap:wrap;justify-content:center;width:min(1100px,100%)}
+.extra-row:empty{display:none}
+.card.mini{width:auto;flex:1 1 220px;max-width:270px;flex-direction:row;justify-content:flex-start;gap:12px;padding:10px 16px;border-radius:24px}
+.card.mini .ico{height:clamp(46px,7vmin,64px);flex:0 0 auto;align-items:center}
+.card.mini .ico svg{height:100%;width:auto}
+.card.mini b{font-size:clamp(17px,2vw,22px)}
+.card.mini span{font-size:clamp(13px,1.5vw,16px)}
 .mode-cards{display:flex;gap:clamp(16px,3vw,36px);flex-wrap:wrap;justify-content:center}
 .card{appearance:none;border:0;cursor:pointer;width:clamp(170px,21vw,260px);padding:22px 18px 24px;border-radius:32px;
   background:linear-gradient(160deg,rgba(255,255,255,.18),rgba(255,255,255,.06));
@@ -122,6 +135,26 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .seg.compact .task{min-width:0;padding:4px 12px;flex-direction:column;justify-self:center}
 .seg.compact .task-text{font-size:clamp(24px,4.4vh,42px)}
 .task-sub{font-size:clamp(11px,1.5vh,14px);font-weight:800;color:var(--muted);margin-top:2px;white-space:nowrap}
+/* Zahlen bis 1000: Aufgaben mit Text oder kleiner Grafik in der Aufgaben-Leiste */
+.task-text.rich{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;font-size:clamp(30px,5.4vh,54px)}
+.task-text.rich .t-lbl{font-size:.4em;color:var(--muted);text-shadow:none;letter-spacing:.01em}
+.task-text.rich .t-big{font-size:1em}
+.task-text.rich .t-seq{font-size:.78em}
+.seg.compact .task-text.rich{font-size:clamp(22px,3.8vh,38px)}
+.ptab{display:flex;gap:6px;text-shadow:none}
+.ptab>div{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.12);border-radius:10px;padding:2px 8px 6px}
+.ptab b{font-size:clamp(13px,1.9vh,17px);color:var(--gold);line-height:1.1}
+.dots{--d:clamp(10px,1.6vh,14px);display:grid;grid-template-columns:repeat(3,var(--d));grid-template-rows:repeat(3,var(--d));gap:3px}
+.dots i{border-radius:50%}
+.dots i.on{background:#fff;box-shadow:0 0 5px rgba(255,255,255,.8)}
+.nline{display:block;width:clamp(280px,32vw,380px);height:auto}
+.gpiece{display:grid;gap:3px;text-shadow:none}
+.gpiece i{display:flex;align-items:center;justify-content:center;width:clamp(42px,5vw,54px);height:clamp(22px,3.3vh,28px);border-radius:5px;font-style:normal;
+  border:1.5px solid rgba(255,255,255,.6);font-size:clamp(14px,2vh,18px);font-weight:900;color:#fff}
+.gpiece i.g{background:rgba(255,255,255,.18)}
+.gpiece i.q{border-color:var(--gold);color:var(--gold);background:rgba(255,213,74,.15)}
+.seg.compact .ptab,.seg.compact .gpiece{transform:scale(.85)}
+.seg.compact .nline{width:clamp(180px,20vw,250px)}
 #tlayer{position:absolute;inset:0;pointer-events:none;z-index:4}
 .tomato{position:absolute;left:0;top:0;will-change:transform,opacity}
 .tomato svg{position:relative;width:100%;height:100%;overflow:visible;display:block}
@@ -236,6 +269,8 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .srow{display:grid;grid-template-columns:4.2em 1fr;gap:12px;align-items:center;padding:8px 12px;border-radius:18px;background:rgba(255,255,255,.07)}
 .srow.hard{background:rgba(255,122,58,.18);box-shadow:0 0 0 2px rgba(255,140,60,.55) inset}
 .srow .lab{font-size:clamp(22px,2.8vw,30px);font-weight:900;text-align:center}
+.topics .srow{grid-template-columns:minmax(9em,30%) 1fr}
+.topics .srow .lab{font-size:clamp(15px,1.9vw,20px);text-align:left;line-height:1.15}
 .srow .barwrap{position:relative;height:22px;border-radius:11px;background:rgba(255,255,255,.1);overflow:hidden}
 .srow .barfill{position:absolute;inset:0;border-radius:11px;transform-origin:left center;transform:scaleX(0);transition:transform .8s cubic-bezier(.2,.9,.3,1)}
 .srow .info{grid-column:2;font-size:clamp(14px,1.7vw,17px);color:var(--muted);font-weight:700;margin-top:-4px}
@@ -399,14 +434,17 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 
   <section class="screen" id="scr-menu">
     <h2 class="menu-title">Wie wollt ihr spielen?</h2>
+    <div class="topic-switch" role="radiogroup" aria-label="Thema">
+      <button class="tsw" data-action="topic" data-topic="mul" role="radio">Einmaleins</button>
+      <button class="tsw" data-action="topic" data-topic="z1000" role="radio">Zahlen bis 1000</button>
+    </div>
     <div class="mode-cards">
       <button class="card" data-action="solo"><div class="ico" id="ico-solo"></div><b>Allein</b><span>60 Sekunden gegen die Uhr</span></button>
       <button class="card" data-action="duel"><div class="ico many" id="ico-duel"></div><b>Zu zweit</b><span>20 Runden</span></button>
       <button class="card" data-action="trio"><div class="ico many" id="ico-trio"></div><b>Zu dritt</b><span>20 Runden</span></button>
       <button class="card" data-action="quad"><div class="ico many" id="ico-quad"></div><b>Zu viert</b><span>20 Runden</span></button>
     </div>
-    <button class="card wide" data-action="journey"><div class="ico" id="ico-journey"></div>
-      <div class="wide-txt"><b>Planeten-Reise</b><span>Reihe für Reihe das Weltall erobern</span></div></button>
+    <div class="extra-row" id="extra-row"></div>
     <p class="hint">Zu zweit, dritt oder viert: iPad flach auf den Tisch legen. Je zwei Kinder sitzen an einer langen Seite.</p>
     <div class="menu-row">
       <button class="btn alt" data-action="profiles">Profile</button>
@@ -472,8 +510,10 @@ const Util = {
 const Store = (() => {
   const KEY = 'tomatenklatsch.v2', OLD_KEY = 'tomatenklatsch.v1';
   const MAX_PROFILES = 8;
-  // Profil: { id, name, fig, best, pairs }  ·  Gast = null (wird nicht gespeichert)
-  const empty = () => ({ profiles: [], muted: false });
+  // Profil: { id, name, fig, best, pairs, planets,            ← Einmaleins
+  //           bestZ, zstats, planets2, mini }                  ← Zahlen bis 1000
+  // Gast = null (wird nicht gespeichert) · topic: 'mul' | 'z1000' (zuletzt gewähltes Thema)
+  const empty = () => ({ profiles: [], muted: false, topic: 'mul' });
   let data = empty();
   const isObj = o => o && typeof o === 'object';
   function load() {
@@ -484,7 +524,10 @@ const Store = (() => {
         data = Object.assign(empty(), isObj(d) ? d : {});
         if (!Array.isArray(data.profiles)) data.profiles = [];
         data.profiles = data.profiles.filter(p => isObj(p) && p.id && typeof p.name === 'string')
-          .map(p => Object.assign({ fig: 'krone', best: 0 }, p, { pairs: isObj(p.pairs) ? p.pairs : {}, planets: isObj(p.planets) ? p.planets : {} }));
+          .map(p => Object.assign({ fig: 'krone', best: 0, bestZ: 0 }, p, {
+            pairs: isObj(p.pairs) ? p.pairs : {}, planets: isObj(p.planets) ? p.planets : {},
+            zstats: isObj(p.zstats) ? p.zstats : {}, planets2: isObj(p.planets2) ? p.planets2 : {}, mini: isObj(p.mini) ? p.mini : {} }));
+        if (data.topic !== 'z1000') data.topic = 'mul';
       } else {
         // alte Fassung ohne Profile: nur die Ton-Einstellung übernehmen, Statistik verwerfen
         const old = localStorage.getItem(OLD_KEY);
@@ -497,12 +540,18 @@ const Store = (() => {
   const get = id => data.profiles.find(p => p.id === id) || null;
   function add(name, fig) {
     if (data.profiles.length >= MAX_PROFILES) return null;
-    const p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, fig, best: 0, pairs: {}, planets: {} };
+    const p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, fig,
+      best: 0, pairs: {}, planets: {}, bestZ: 0, zstats: {}, planets2: {}, mini: {} };
     data.profiles.push(p); save(); return p;
   }
   function update(id, name, fig) { const p = get(id); if (p) { p.name = name; p.fig = fig; save(); } return p; }
   function remove(id) { data.profiles = data.profiles.filter(p => p.id !== id); save(); }
-  function resetStats(id) { const p = get(id); if (p) { p.pairs = {}; p.best = 0; save(); } }
+  /** Statistik eines Themas zurücksetzen (Reise-Fortschritt bleibt) */
+  function resetStats(id, topic = 'mul') {
+    const p = get(id); if (!p) return;
+    if (topic === 'z1000') { p.zstats = {}; p.bestZ = 0; p.mini = {}; } else { p.pairs = {}; p.best = 0; }
+    save();
+  }
   return { load, save, get, add, update, remove, resetStats, MAX_PROFILES,
     get data() { return data; }, get profiles() { return data.profiles; } };
 })();
@@ -538,7 +587,31 @@ const Stats = (() => {
     }
     return r;
   }
-  return { record, rows };
+  /* Zahlen bis 1000: Erfassung pro Themengruppe (profile.zstats[gruppe]) */
+  function recordZ(profile, group, correct, ms) {
+    if (!profile || !group) return;
+    const z = profile.zstats || (profile.zstats = {});
+    const e = z[group] || (z[group] = { n: 0, wrong: 0, tSum: 0, tN: 0 });
+    e.n++;
+    if (!correct) e.wrong++;
+    else if (ms > 0 && ms < 60000) { e.tSum += ms; e.tN++; }
+    Store.save();
+  }
+  /** Auswertung wie bei den Reihen; Zeit-Skala großzügiger (3 s .. 12 s), weil mehr zu lesen ist */
+  function rowsZ(profile) {
+    const z = (profile && profile.zstats) || {};
+    return NumTasks.GROUPS.map(gr => {
+      const e = z[gr.id] || { n: 0, wrong: 0, tSum: 0, tN: 0 };
+      const x = { row: gr.id, label: gr.name, n: e.n, wrong: e.wrong, tSum: e.tSum, tN: e.tN };
+      x.errRate = x.n ? x.wrong / x.n : 0;
+      x.avgMs = x.tN ? x.tSum / x.tN : 0;
+      const tScore = x.tN ? Util.clamp((x.avgMs - 3000) / 9000, 0, 1) : 0;
+      x.score = x.n ? 0.6 * Math.min(1, x.errRate / 0.5) + 0.4 * tScore : 0;
+      x.enough = x.n >= 3;
+      return x;
+    });
+  }
+  return { record, rows, recordZ, rowsZ };
 })();
 
 /* ---------------- Logic: Aufgaben & Fehlerwerte (rein, testbar) ---------------- */
@@ -627,6 +700,209 @@ const Logic = (() => {
     return { ok: fails.length === 0, fails: fails.slice(0, 20), checked: 100 * 3 * 5 + 500 };
   }
   return { shuffle, candidates, makeDistractors, makeTask, makeRound, roundFor, selfTest };
+})();
+
+/* ---------------- NumTasks: Aufgaben „Zahlen bis 1000“ fürs Tomaten-Spiel (rein, testbar) ----------------
+   Jede Aufgabe: { kind, group, html (Anzeige in der Aufgaben-Leiste), answer, values (inkl. answer), ok(v), key, label }.
+   Falschwerte sind typische Kinderfehler: Zahlendreher, vergessener Übertrag, falsche Schrittweite … */
+const NumTasks = (() => {
+  const R = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const inRange = v => Number.isInteger(v) && v >= 0 && v <= 1000;
+  const rev = n => Number(String(n).split('').reverse().join(''));
+  const swapZE = n => Math.floor(n / 100) * 100 + (n % 10) * 10 + Math.floor(n / 10) % 10;   // Zehner und Einer vertauscht
+  /** Antwort + (count-1) verschiedene Falschwerte: erst die typischen Fehler, dann auffüllen */
+  function pack(answer, cands, count, ok, fill) {
+    const seen = new Set([String(answer)]), out = [];
+    for (const c of Logic.shuffle(cands)) {
+      if (out.length >= count - 1) break;
+      if (ok(c) && !seen.has(String(c))) { seen.add(String(c)); out.push(c); }
+    }
+    for (let g = 0; out.length < count - 1 && g < 500; g++) {
+      const c = fill();
+      if (ok(c) && !seen.has(String(c))) { seen.add(String(c)); out.push(c); }
+    }
+    for (let g = 0; out.length < count - 1 && g < 2000; g++) {   // Absicherung an den Rändern (nahe 0 / 1000)
+      const c = R(1, 1000);
+      if (ok(c) && !seen.has(String(c))) { seen.add(String(c)); out.push(c); }
+    }
+    return Logic.shuffle([answer, ...out]);
+  }
+  const lbl = (small, big) => `<div class="t-lbl">${small}</div><div class="t-big">${big}</div>`;
+
+  /* größte / kleinste Zahl: Ziffern-Vertauschungen wie 734 · 743 · 739, manchmal eine Zweistellige */
+  function extreme(kind, count) {
+    let d; do { d = [R(1, 9), R(Math.random() < .3 ? 0 : 1, 9), R(1, 9)]; } while (new Set(d).size < 3);
+    const perms = [...new Set([[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]]
+      .map(p => p.map(i => d[i])).filter(x => x[0] !== 0).map(x => x[0] * 100 + x[1] * 10 + x[2]))];
+    const vals = Logic.shuffle(perms).slice(0, Math.min(perms.length, count - 2));
+    const extra = [vals[0] + pick([-1, 1]) * R(1, 9), vals[0] + pick([-10, 10]), vals[1] + pick([-100, 100])];
+    if (Math.random() < .4) extra.unshift(d[0] * 10 + d[2]);
+    for (const e of extra) if (vals.length < count && inRange(e) && e > 0 && !vals.includes(e)) vals.push(e);
+    while (vals.length < count) { const e = R(100, 999); if (!vals.includes(e)) vals.push(e); }
+    const max = kind === 'max', answer = max ? Math.max(...vals) : Math.min(...vals);
+    return { answer, values: Logic.shuffle(vals), ok: v => v === answer,
+      html: lbl('Pflücke die', max ? 'größte Zahl' : 'kleinste Zahl'), key: kind + vals.slice().sort().join('.'), label: max ? 'größte Zahl' : 'kleinste Zahl' };
+  }
+  /* „größer als 331“ / „kleiner als 331“: genau eine Tomate passt, die anderen liegen knapp daneben (oder sind genau 331) */
+  function threshold(kind, count) {
+    const up = kind === 'gt', s = up ? 1 : -1;
+    let x, answer;
+    do {
+      x = R(120, 880);
+      answer = Math.random() < .35 && rev(x) * s > x * s ? rev(x) : x + s * R(1, 45);
+    } while (!inRange(answer) || answer <= 0);
+    const other = v => inRange(v) && v > 0 && v * s <= x * s;
+    const values = pack(answer, [x, x - s * R(1, 9), x - s * R(10, 40), rev(x), x - s * 100, swapZE(x), x - s * R(41, 150)],
+      count, other, () => x - s * R(0, 220));
+    return { answer, values, ok: v => v * s > x * s, html: lbl(up ? 'Pflücke eine Zahl größer als' : 'Pflücke eine Zahl kleiner als', x),
+      key: kind + x, label: (up ? 'größer als ' : 'kleiner als ') + x };
+  }
+  /* < > = zwischen zwei ähnlichen Zahlen */
+  function compare() {
+    const a = R(100, 999);
+    const variants = [rev(a), swapZE(a), a + pick([-1, 1]) * R(1, 9), a + pick([-1, 1]) * pick([10, 100]), Math.floor(a / 10)]
+      .filter(v => inRange(v) && v > 0 && v !== a);
+    const b = Math.random() < .1 || !variants.length ? a : pick(variants);
+    const [l, r] = Math.random() < .5 ? [a, b] : [b, a];
+    const answer = l < r ? '<' : l > r ? '>' : '=';
+    return { answer, values: Logic.shuffle(['<', '>', '=']), ok: v => v === answer,
+      html: `<div class="t-big">${l} <span class="q">◯</span> ${r}</div>`, key: `cmp${l}.${r}`, label: `${l} ◯ ${r}` };
+  }
+  /* Vorgänger / Nachfolger – oft an den kniffligen Stellen …9 / …99 bzw. …0 / …00 */
+  function neighbor(kind, count) {
+    const up = kind === 'succ', t = Math.random();
+    const n = up ? (t < .3 ? R(1, 9) * 100 + 99 : t < .6 ? R(10, 99) * 10 + 9 : R(100, 998))
+                 : (t < .3 ? R(1, 9) * 100 : t < .6 ? R(10, 99) * 10 : R(101, 999));
+    const answer = up ? n + 1 : n - 1;
+    const c = up ? [n - 1, n - 9, n - 99, n + 10, n + 11, n + 2, n]          // 899 → 898, 890, 800, 909, 910 …
+                 : [n + 1, n + 9, n + 99, n - 10, n - 11, n - 2, n - 101];   // 240 → 241, 249, 339, 230, 229 …
+    const values = pack(answer, c, count, v => inRange(v) && v > 0, () => answer + pick([-1, 1]) * R(2, 30));
+    return { answer, values, ok: v => v === answer, html: lbl(up ? 'Nachfolger von' : 'Vorgänger von', n),
+      key: kind + n, label: (up ? 'Nachfolger von ' : 'Vorgänger von ') + n };
+  }
+  /* Nachbarzehner / Nachbarhunderter */
+  function round10(kind, count) {
+    const hund = kind === 'hunUp' || kind === 'hunDown', up = kind === 'tenUp' || kind === 'hunUp', s = hund ? 100 : 10;
+    let n; do { n = hund ? R(101, 989) : R(11, 989); } while (n % s === 0);
+    const lo = Math.floor(n / s) * s, hi = lo + s, answer = up ? hi : lo;
+    const other = hund ? 10 : 100, o = up ? Math.ceil(n / other) * other : Math.floor(n / other) * other;
+    const c = [up ? lo : hi, answer + s, answer - s, n + (up ? s : -s), up ? n + 1 : n - 1, o, answer + (up ? other : -other)];
+    const values = pack(answer, c, count, v => inRange(v) && v > 0,
+      () => pick([answer + pick([-1, 1]) * s * R(1, 3), n + pick([-1, 1]) * R(1, 9), answer + pick([-1, 1]) * pick([10, 20, 50]), R(1, 10) * s]));
+    const word = hund ? 'Hunderter' : 'Zehner';
+    return { answer, values, ok: v => v === answer, html: lbl(`${word} ${up ? 'nach' : 'vor'}`, n),
+      key: kind + n, label: `${word} ${up ? 'nach' : 'vor'} ${n}` };
+  }
+  /* Zahlenfolgen: 954, 958, 962, ? */
+  function sequence(count) {
+    const step = pick([2, 3, 4, 5, 5, 10, 10, 20, 25, 50, 100]), down = Math.random() < .25, d = down ? -1 : 1;
+    const start = down ? R(step * 3, 1000) : R(0, 1000 - step * 3);
+    const terms = [0, 1, 2].map(i => start + d * step * i), last = terms[2], answer = start + d * step * 3;
+    const c = [last + d * (step + 1), last + d * (step - 1), last, last + d * step * 2, last - d * step,
+      last + d * (step === 10 ? 1 : 10), last + d * step * 10];
+    const values = pack(answer, c, count, v => inRange(v) && v !== answer, () => answer + pick([-1, 1]) * R(1, step + 3));
+    return { answer, values, ok: v => v === answer, html: `<div class="t-seq">${terms.join(', ')}, <span class="q">?</span></div>`,
+      key: 'seq' + terms.join('.'), label: terms.join(', ') + ', ?' };
+  }
+  /* Stellentafel mit Punkten (wie Würfelbilder) */
+  const DICE = { 0: [], 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8],
+    7: [0, 2, 3, 4, 5, 6, 8], 8: [0, 1, 2, 3, 5, 6, 7, 8], 9: [0, 1, 2, 3, 4, 5, 6, 7, 8] };
+  const dots = d => `<span class="dots">${Array.from({ length: 9 }, (_, i) => `<i${DICE[d].includes(i) ? ' class="on"' : ''}></i>`).join('')}</span>`;
+  function place(count) {
+    const h = R(1, 9), z = Math.random() < .2 ? 0 : R(0, 9), e = Math.random() < .2 ? 0 : R(0, 9), answer = h * 100 + z * 10 + e;
+    const c = [e * 100 + z * 10 + h, h * 100 + e * 10 + z, z * 100 + h * 10 + e, h * 10 + e, h * 10 + z, h + z + e,
+      answer + 10, answer - 10, answer + 1, answer + 100];
+    const values = pack(answer, c, count, v => inRange(v) && v > 0, () => answer + pick([-1, 1]) * pick([1, 10, 100]) * R(1, 2));
+    return { answer, values, ok: v => v === answer,
+      html: `<div class="ptab"><div><b>H</b>${dots(h)}</div><div><b>Z</b>${dots(z)}</div><div><b>E</b>${dots(e)}</div></div>`,
+      key: 'place' + answer, label: `Stellentafel ${h} H, ${z} Z, ${e} E` };
+  }
+  /* Zahlenstrahl ablesen: Pfeil zeigt auf eine Stelle (3 Ausschnitte: 0–1000, ein Hunderter, ein Zehner) */
+  function lineRead(count) {
+    const lvl = R(1, 3);
+    let lo, hi, tick, labels, v;
+    if (lvl === 1) { lo = 0; hi = 1000; tick = 50; labels = [0, 500, 1000]; v = R(1, 19) * 50; }
+    else if (lvl === 2) { lo = R(0, 9) * 100; hi = lo + 100; tick = 10; labels = [lo, lo + 50, hi]; v = lo + R(1, 9) * 10; }
+    else { lo = R(0, 99) * 10; hi = lo + 10; tick = 1; labels = [lo, hi]; v = lo + R(1, 9); }
+    const answer = v;
+    const wrongScale = lvl === 1 ? v / 10 : lvl === 2 ? lo + (v - lo) / 10 : lo + (v - lo) * 10;
+    const c = [v + tick, v - tick, v + 2 * tick, v - 2 * tick, wrongScale, hi - (v - lo), lvl === 1 ? v + 100 : v + 1];
+    const values = pack(answer, c, count, x => inRange(x) && x !== answer, () => answer + pick([-1, 1]) * tick * R(1, 8));
+    const W = 260, x0 = 14, x1 = W - 14, X = n => x0 + (n - lo) / (hi - lo) * (x1 - x0);
+    let svg = `<svg class="nline" viewBox="0 0 ${W} 60" width="${W}" height="60"><path d="M${x0 - 6} 34H${x1 + 6}" stroke="#fff" stroke-width="2.5"/>`;
+    for (let n = lo; n <= hi; n += tick) {
+      const major = labels.includes(n) || (lvl === 1 && n % 100 === 0) || (lvl === 3 && n === lo + 5);
+      svg += `<path d="M${X(n).toFixed(1)} ${major ? 26 : 29}V${major ? 42 : 39}" stroke="#fff" stroke-width="${major ? 2 : 1.2}" opacity="${major ? 1 : .8}"/>`;
+    }
+    for (const n of labels) svg += `<text x="${X(n).toFixed(1)}" y="56" text-anchor="middle" font-size="12" fill="#fff" font-weight="800">${n}</text>`;
+    svg += `<path d="M${X(v).toFixed(1)} 26l-6 -12h12z" fill="#ffd54a" stroke="#c98a00" stroke-width="1"/></svg>`;
+    return { answer, values, ok: x => x === answer, html: svg, key: `line${lo}.${v}`, label: `Zahlenstrahl ${lo}–${hi}, Pfeil bei ?` };
+  }
+  /* Stück aus dem Hunderterfeld: eine Zahl ist gegeben, welche Zahl steht beim „?“ */
+  function gridPiece(count) {
+    const H = R(0, 9) * 100;
+    let r0, c0, dr, dc;
+    do { r0 = R(0, 9); c0 = R(0, 9); dr = R(-2, 2); dc = R(-2, 2); }
+    while ((!dr && !dc) || r0 + dr < 0 || r0 + dr > 9 || c0 + dc < 0 || c0 + dc > 9);
+    const g = H + r0 * 10 + c0 + 1, answer = g + dr * 10 + dc;
+    const rows = [Math.min(0, dr), Math.max(0, dr)], cols = [Math.min(0, dc), Math.max(0, dc)];
+    let cells = '';
+    for (let r = rows[0]; r <= rows[1]; r++) for (let c = cols[0]; c <= cols[1]; c++)
+      cells += r === 0 && c === 0 ? `<i class="g">${g}</i>` : r === dr && c === dc ? '<i class="q">?</i>' : '<i></i>';
+    const c = [answer + 1, answer - 1, answer + 10, answer - 10, g - (dr * 10 + dc), g + dc * 10 + dr, answer + 9, answer - 9, answer + 11];
+    const values = pack(answer, c, count, v => inRange(v) && v > 0,
+      () => answer + pick([-1, 1]) * (Math.random() < .5 ? pick([1, 2, 10, 20]) : R(3, 25)));
+    return { answer, values, ok: v => v === answer,
+      html: `<div class="gpiece" style="grid-template-columns:repeat(${cols[1] - cols[0] + 1},auto)">${cells}</div>`,
+      key: `grid${g}.${answer}`, label: `Hunderterfeld: ${g} → ?` };
+  }
+
+  const KINDS = {
+    max: c => extreme('max', c), min: c => extreme('min', c), gt: c => threshold('gt', c), lt: c => threshold('lt', c), cmp: compare,
+    succ: c => neighbor('succ', c), pred: c => neighbor('pred', c),
+    tenUp: c => round10('tenUp', c), tenDown: c => round10('tenDown', c), hunUp: c => round10('hunUp', c), hunDown: c => round10('hunDown', c),
+    seq: sequence, place, lineRead, gridPiece,
+  };
+  /** Themengruppen: Statistik, Galaxie-Planeten (kinds leer = nur eigenes Spiel) */
+  const GROUPS = [
+    { id: 'nachbarn', name: 'Vorgänger und Nachfolger', kinds: ['succ', 'pred'] },
+    { id: 'vergleichen', name: 'Größer und kleiner', kinds: ['max', 'min', 'gt', 'lt', 'cmp'] },
+    { id: 'zehner', name: 'Nachbarzehner und -hunderter', kinds: ['tenUp', 'tenDown', 'hunUp', 'hunDown'] },
+    { id: 'stellen', name: 'Stellentafel', kinds: ['place'] },
+    { id: 'folgen', name: 'Zahlenfolgen', kinds: ['seq'] },
+    { id: 'strahl', name: 'Zahlenstrahl', kinds: ['lineRead'] },
+    { id: 'hunderter', name: 'Hunderterfeld', kinds: ['gridPiece'] },
+    { id: 'ziffern', name: 'Ziffernkarten', kinds: [] },
+  ];
+  const groupOf = kind => (GROUPS.find(g => g.kinds.includes(kind)) || {}).id;
+  const groupName = id => (GROUPS.find(g => g.id === id) || {}).name || id;
+  function byKind(kind, count = 6) {
+    const r = KINDS[kind](count);
+    return Object.assign(r, { kind, group: groupOf(kind) });
+  }
+  /** zufällige Aufgabe: erst Thema gleichmäßig, dann Art; nicht zweimal dieselbe Art hintereinander */
+  function make(opts = {}) {
+    const groups = GROUPS.filter(g => g.kinds.length);
+    let k, guard = 0;
+    do { k = pick(pick(groups).kinds); } while (k === opts.last && guard++ < 10);
+    return byKind(k, opts.count || 6);
+  }
+  /** Selbsttest: je Art viele Aufgaben – genau eine passende Tomate, keine Duplikate, gültige Werte */
+  function selfTest() {
+    const fails = [];
+    for (const kind in KINDS) for (let i = 0; i < 300; i++) {
+      const n = 3 + (i % 6), r = byKind(kind, n), vals = r.values.map(String);
+      const want = kind === 'cmp' ? 3 : n;
+      if (r.values.length !== want) fails.push(`${kind}: ${r.values.length} statt ${want} Werte`);
+      if (new Set(vals).size !== vals.length) fails.push(`${kind}: Duplikat ${vals}`);
+      if (r.values.filter(r.ok).length !== 1) fails.push(`${kind}: ${r.values.filter(r.ok).length} passende Werte (${r.label}: ${vals})`);
+      if (!r.ok(r.answer) || !r.values.includes(r.answer)) fails.push(`${kind}: Antwort fehlt`);
+      if (kind !== 'cmp' && r.values.some(v => !inRange(v))) fails.push(`${kind}: Wert außerhalb 0–1000 ${vals}`);
+    }
+    return { ok: !fails.length, fails: fails.slice(0, 20), checked: Object.keys(KINDS).length * 300 };
+  }
+  return { KINDS, GROUPS, groupOf, groupName, byKind, make, selfTest };
 })();
 
 /* ---------------- Journey: Planeten-Reise (Missionen, Sterne, Empfehlung) ---------------- */
@@ -879,7 +1155,7 @@ const Art = (() => {
       <path d="M${cx} ${cy + 1}Q${cx + 1} ${cy - 8} ${cx + 5} ${cy - 12}" fill="none" stroke="#3f7d2a" stroke-width="4.2" stroke-linecap="round"/></g>`;
   }
   function numberText(value) {
-    const fs = String(value).length >= 3 ? 33 : 42;
+    const len = String(value).length, fs = len >= 4 ? 27 : len === 3 ? 33 : 42;
     return `<text class="num" x="50" y="62" dy=".35em" text-anchor="middle" font-size="${fs}">${value}</text>`;
   }
   // feste Flecken für faule Tomate (deterministisch)
@@ -1283,7 +1559,8 @@ const Game = (() => {
   function showTask(r) {
     for (const t of g.dom.tasks) {
       const tx = t.querySelector('.task-text');
-      tx.innerHTML = `<span>${r.a}</span><span class="op">×</span><span>${r.b}</span><span class="op">=</span><span class="q">?</span>`;
+      tx.classList.toggle('rich', !!r.html);   // Zahlen bis 1000: Text/Grafik statt „a × b“
+      tx.innerHTML = r.html || `<span>${r.a}</span><span class="op">×</span><span>${r.b}</span><span class="op">=</span><span class="q">?</span>`;
       FX.anim(tx, Util.reducedMotion ? [{ opacity: 0 }, { opacity: 1 }] :
         [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1.15)', opacity: 1, offset: .6 }, { transform: 'scale(1)', opacity: 1 }],
         { duration: 420, easing: 'ease-out' });
@@ -1306,13 +1583,13 @@ const Game = (() => {
 
   /* ----- Ablauf ----- */
   /** mode: 'solo' | 'planet' | 'duel' | 'trio' | 'quad'; profiles: [Profil | null (Gast), …] in Platz-Reihenfolge;
-      opts (nur 'planet'): { row, tasks: [{a, b}, …] } */
+      opts: { topic: 'mul' | 'z1000' } · nur 'planet': { row, tasks: [{a, b} | {kind}, …] } */
   function start(mode, profiles = [], opts = {}) {
     gid++;
     if (g) g.over = true;
     FX.clear();
     const n = SLOTS[mode].length;
-    g = { id: gid, mode, n, round: 0, tomatoes: [], task: null, accepting: false, running: false, over: false, paused: false,
+    g = { id: gid, mode, n, topic: opts.topic || 'mul', round: 0, tomatoes: [], task: null, accepting: false, running: false, over: false, paused: false,
       prof: SLOTS[mode].map((_, i) => profiles[i] || null),
       players: SLOTS[mode].map(() => ({ score: 0, shown: 0, wrong: 0, log: [] })),
       endAt: 0, lastTick: 99 };
@@ -1352,10 +1629,13 @@ const Game = (() => {
     let r;
     if (g.mode === 'planet') {
       if (!g.plan.queue.length) return finish();
-      const t = g.plan.queue.shift();
+      const t = g.plan.queue.shift(), count = Math.random() < .5 ? 6 : 7;
       g.plan.curWrong = false;
-      r = Logic.roundFor(t.a, t.b, Math.random() < .5 ? 6 : 7);
+      r = t.round ? Object.assign({}, t.round, { values: Logic.shuffle(t.round.values) })   // Wiederholung: dieselbe Aufgabe
+        : t.kind ? NumTasks.byKind(t.kind, count) : Logic.roundFor(t.a, t.b, count);
       if (g.dom.totEl) g.dom.totEl.textContent = g.plan.total;
+    } else if (g.topic === 'z1000') {
+      r = NumTasks.make({ count: g.n > 1 ? 6 : (Math.random() < .5 ? 6 : 7), last: g.task && g.task.kind });
     } else r = Logic.makeRound(Math.random, { count: g.n > 1 ? 6 : 0, last: g.task });
     g.round++;
     g.task = r;
@@ -1389,13 +1669,15 @@ const Game = (() => {
       res = { mode: 'planet', players: g.prof, row: P.row, stars: s, before, after, wrongTasks: P.wrongTasks,
         allConquered: before < 3 && after >= 3 && Journey.conqueredCount(prof) === Journey.ROUTE.length };
     } else if (g.mode === 'solo') {
-      const p1 = g.players[0], prof = g.prof[0], prev = prof ? prof.best || 0 : 0, newBest = !!prof && p1.score > prev;
-      if (newBest) { prof.best = p1.score; Store.save(); }  // Rekord nur mit Profil
+      // Rekord nur mit Profil, getrennt nach Thema
+      const p1 = g.players[0], prof = g.prof[0], bk = g.topic === 'z1000' ? 'bestZ' : 'best';
+      const prev = prof ? prof[bk] || 0 : 0, newBest = !!prof && p1.score > prev;
+      if (newBest) { prof[bk] = p1.score; Store.save(); }
       const hits = p1.log.filter(l => l.correct);
-      res = { mode: 'solo', players: g.prof, score: p1.score, best: Math.max(prev, p1.score), newBest,
+      res = { mode: 'solo', topic: g.topic, players: g.prof, score: p1.score, best: Math.max(prev, p1.score), newBest,
         avgMs: hits.length ? hits.reduce((s, l) => s + l.ms, 0) / hits.length : 0, wrong: p1.wrong, log: p1.log };
     } else {
-      res = { mode: g.mode, players: g.prof, scores: g.players.map(p => p.score), logs: g.players.map(p => p.log) };
+      res = { mode: g.mode, topic: g.topic, players: g.prof, scores: g.players.map(p => p.score), logs: g.players.map(p => p.log) };
     }
     UI.showResult(res);
   }
@@ -1427,12 +1709,17 @@ const Game = (() => {
     if (best.correct) { if (g.accepting) hitCorrect(best, player, now); }
     else hitWrong(best, player, now);
   }
+  /** Statistik: Einmaleins pro Faktorpaar, Zahlen bis 1000 pro Themengruppe */
+  function recordStat(player, r, correct, ms) {
+    if (r.group) Stats.recordZ(g.prof[player], r.group, correct, ms);
+    else Stats.record(g.prof[player], r.a, r.b, correct, ms);
+  }
   function hitCorrect(t, player, now) {
     // Events kommen in Zeitstempel-Reihenfolge an: der erste richtige Treffer sperrt die Runde.
     g.accepting = false;
     const r = g.task, ms = now - g.roundT0, P = g.players[player];
-    P.score++; P.log.push({ a: r.a, b: r.b, correct: true, ms });
-    Stats.record(g.prof[player], r.a, r.b, true, ms);
+    P.score++; P.log.push({ a: r.a, b: r.b, kind: r.kind, correct: true, ms });
+    recordStat(player, r, true, ms);
     if (g.plan) g.plan.times.push(ms - t.delay);   // ab dem Erscheinen der richtigen Tomate
     t.state = 'pick'; t.t0 = now; t.owner = player; t.el.style.zIndex = 10;
     Sound.pluck();
@@ -1449,17 +1736,17 @@ const Game = (() => {
   function hitWrong(t, player, now) {
     if (t.state === 'rot') return;
     const r = g.task, P = g.players[player];
-    P.wrong++; P.log.push({ a: r.a, b: r.b, correct: false, ms: now - g.roundT0, value: t.value });
-    Stats.record(g.prof[player], r.a, r.b, false, 0);
+    P.wrong++; P.log.push({ a: r.a, b: r.b, kind: r.kind, correct: false, ms: now - g.roundT0, value: t.value });
+    recordStat(player, r, false, 0);
     if (g.plan) {
-      const P = g.plan, key = Math.min(r.a, r.b) + '×' + Math.max(r.a, r.b);
+      const P = g.plan, key = r.key || Math.min(r.a, r.b) + '×' + Math.max(r.a, r.b), label = r.label || `${r.a} × ${r.b}`;
       P.wrong++;
       if (!P.curWrong) {
         P.curWrong = true;
-        if (!P.wrongTasks.includes(`${r.a} × ${r.b}`)) P.wrongTasks.push(`${r.a} × ${r.b}`);
+        if (!P.wrongTasks.includes(label)) P.wrongTasks.push(label);
         if (!P.retried.has(key)) {   // diese Aufgabe kommt etwas später noch einmal dran
           P.retried.add(key);
-          P.queue.splice(Math.min(2, P.queue.length), 0, { a: r.a, b: r.b });
+          P.queue.splice(Math.min(2, P.queue.length), 0, r.kind ? { round: r } : { a: r.a, b: r.b });
           P.total++;
           if (g.dom.totEl) g.dom.totEl.textContent = P.total;
         }
@@ -1606,6 +1893,7 @@ const UI = (() => {
     current = name;
     if (name === 'stats') renderStats();
     if (name === 'profiles') renderProfiles();
+    if (name === 'menu') renderMenu();
   }
 
   /* ----- Dialog ----- */
@@ -1858,11 +2146,31 @@ const UI = (() => {
   }
 
   /* ----- Aktionen ----- */
-  function startGame(mode, players) {
-    last = { mode, players };
+  function startGame(mode, players, topic = Store.data.topic) {
+    last = { mode, players, topic };
     go('game');
-    Game.start(mode, players);
+    Game.start(mode, players, { topic });
   }
+
+  /* ----- Menü: Themen-Wahl und Zusatz-Spiele ----- */
+  const isZ = () => Store.data.topic === 'z1000';
+  function renderMenu() {
+    const z = isZ();
+    S.menu.querySelectorAll('.tsw').forEach(b => {
+      const on = b.dataset.topic === Store.data.topic;
+      b.classList.toggle('on', on); b.setAttribute('aria-checked', on);
+    });
+    const row = document.getElementById('extra-row');
+    if (!z) {
+      row.innerHTML = `<button class="card wide" data-action="journey"><div class="ico">${[2, 7, 10].map(r => Art.planetSVG(r)).join('')}</div>
+        <div class="wide-txt"><b>Planeten-Reise</b><span>Reihe für Reihe das Weltall erobern</span></div></button>`;
+    } else {
+      row.innerHTML = MINI_CARDS.map(c => `<button class="card mini" data-action="${c.action}" data-game="${c.game || ''}">
+        <div class="ico">${c.icon()}</div><div class="wide-txt"><b>${c.title}</b><span>${c.sub}</span></div></button>`).join('');
+    }
+  }
+  /** Zusatz-Karten im Thema „Zahlen bis 1000“ (die Spiele selbst kommen aus Mini) */
+  const MINI_CARDS = [];
   const actions = {
     start() { Sound.unlock(); go('menu'); },
     solo() { openPick('solo'); },
@@ -1871,9 +2179,10 @@ const UI = (() => {
     quad() { openPick('quad'); },
     again() {
       if (last.mode === 'planet') { const p0 = last.players[0]; journeyProf = p0 ? Store.get(p0.id) : null; return startMission(last.row); }
-      startGame(last.mode, last.players.map(p => p && Store.get(p.id)));   // gelöschtes Profil → Gast
+      startGame(last.mode, last.players.map(p => p && Store.get(p.id)), last.topic);   // gelöschtes Profil → Gast
     },
     journey() { openPick('planet'); },
+    topic(b) { Store.data.topic = b.dataset.topic === 'z1000' ? 'z1000' : 'mul'; Store.save(); renderMenu(); },
     tomap() { renderMap(); go('map'); },
     planet(b) {
       const row = +b.dataset.row;
@@ -1916,9 +2225,10 @@ const UI = (() => {
     statsp(b) { statsSel = b.dataset.id; renderStats(); },
     reset() {
       const p = Store.get(statsSel); if (!p) return;
-      dialog(`Statistik von ${p.name} löschen?`, 'Alle gesammelten Werte und der Rekord werden gelöscht. Das kann man nicht rückgängig machen.', [
+      const topic = Store.data.topic;
+      dialog(`Statistik von ${p.name} löschen?`, `Alle gesammelten Werte und Rekorde zum Thema „${topic === 'z1000' ? 'Zahlen bis 1000' : 'Einmaleins'}“ werden gelöscht. Die Planeten-Reisen bleiben erhalten. Das kann man nicht rückgängig machen.`, [
         { label: 'Abbrechen', cls: 'ghost' },
-        { label: 'Ja, löschen', cls: 'danger', fn: () => { Store.resetStats(p.id); renderStats(); } }]);
+        { label: 'Ja, löschen', cls: 'danger', fn: () => { Store.resetStats(p.id, topic); renderStats(); } }]);
     },
   };
   function updateMute() {
@@ -1994,26 +2304,36 @@ const UI = (() => {
     document.getElementById('stats-chips').innerHTML = profs.map(p =>
       `<button class="chip ${p.id === statsSel ? 'sel' : ''}" data-action="statsp" data-id="${p.id}">${Art.figureOf(p)}<span>${esc(p.name)}</span></button>`).join('');
     document.querySelector('#scr-stats [data-action="reset"]').style.visibility = prof ? 'visible' : 'hidden';
-    const rows = Stats.rows(prof);
+    const z = isZ(), what = z ? 'Themen' : 'Reihen';
+    document.querySelector('#scr-stats .stats-head h2').textContent = z ? 'Zahlen bis 1000' : 'Deine Reihen';
+    const rows = z ? Stats.rowsZ(prof) : Stats.rows(prof);
+    const name = r => z ? r.label : r.row + 'er';
     const played = rows.filter(r => r.n > 0);
     const hard = rows.filter(r => r.enough && r.score >= .25).sort((a, b) => b.score - a.score).slice(0, 3);
     const hardSet = new Set(hard.map(r => r.row));
     let tip;
-    if (!prof) tip = 'Lege unter „Profile“ ein Profil an. Dann zeige ich dir hier, welche Reihen noch knifflig sind.';
-    else if (!rows.some(r => r.enough)) tip = `${esc(prof.name)}, spiel ein paar Runden, dann zeige ich dir hier, welche Reihen noch knifflig sind.`;
-    else if (!hard.length) tip = `Super, ${esc(prof.name)}! Alle Reihen klappen schon richtig gut. 🌟`;
+    if (!prof) tip = `Lege unter „Profile“ ein Profil an. Dann zeige ich dir hier, welche ${what} noch knifflig sind.`;
+    else if (!rows.some(r => r.enough)) tip = `${esc(prof.name)}, spiel ein paar Runden, dann zeige ich dir hier, welche ${what} noch knifflig sind.`;
+    else if (!hard.length) tip = `Super, ${esc(prof.name)}! Alle ${what} klappen schon richtig gut. 🌟`;
+    else if (z) {
+      const names = hard.map(r => `„${r.label}“`);
+      tip = names.length === 1 ? `Das Thema ${names[0]} ist noch knifflig! Übe es ruhig noch ein bisschen.`
+        : `Die Themen ${names.slice(0, -1).join(', ')} und ${names[names.length - 1]} sind noch knifflig!`;
+    }
     else if (hard.length === 1) tip = `Die ${hard[0].row}er-Reihe ist noch knifflig! Übe sie ruhig noch ein bisschen.`;
     else {
       const names = hard.map(r => r.row + 'er');
       tip = `Die ${names.slice(0, -1).map(n => n + '-').join(', die ')} und die ${names[names.length - 1]}-Reihe sind noch knifflig!`;
     }
     document.getElementById('stats-tip').innerHTML = Art.figureOf(prof) + `<span>${tip}</span>`;
-    const sorted = [...played].sort((a, b) => b.score - a.score || a.row - b.row).concat(rows.filter(r => r.n === 0));
+    const order = r => rows.indexOf(r);
+    const sorted = [...played].sort((a, b) => b.score - a.score || order(a) - order(b)).concat(rows.filter(r => r.n === 0));
     const list = document.getElementById('stats-list');
+    list.classList.toggle('topics', z);
     list.innerHTML = sorted.map(r => {
       const color = r.score < .25 ? '#7be05a' : r.score < .5 ? '#ffd54a' : '#ff7a3a';
       const info = r.n ? `${r.n} Versuche · ${r.wrong} daneben${r.tN ? ' · Ø ' + fmtS(r.avgMs) + ' s' : ''}` : 'noch nicht gespielt';
-      return `<div class="srow ${hardSet.has(r.row) ? 'hard' : ''}"><div class="lab">${r.row}er</div>
+      return `<div class="srow ${hardSet.has(r.row) ? 'hard' : ''}"><div class="lab">${name(r)}</div>
         <div class="barwrap"><div class="barfill" data-s="${r.n ? Math.max(.04, r.score) : 0}" style="background:${color}"></div></div>
         <div class="info">${info}</div></div>`;
     }).join('');
@@ -2128,7 +2448,6 @@ const Pwa = (() => {
   document.getElementById('ico-solo').innerHTML = Art.tomatoSVG(V[2], null);
   document.getElementById('ico-duel').innerHTML = Art.tomatoSVG(V[5], null) + Art.tomatoSVG(V[3], null);
   document.getElementById('ico-trio').innerHTML = [V[0], V[1], V[8]].map(v => Art.tomatoSVG(v, null)).join('');
-  document.getElementById('ico-journey').innerHTML = [2, 7, 10].map(r => Art.planetSVG(r)).join('');
   document.getElementById('ico-quad').innerHTML = [V[7], V[3], V[2], V[4]].map(v => Art.tomatoSVG(v, null)).join('');
   Pwa.registerSW();
   Pwa.guards();
@@ -2144,9 +2463,10 @@ const Pwa = (() => {
   const frame = t => { Bg.draw(t); Game.update(t); requestAnimationFrame(frame); };
   requestAnimationFrame(frame);
 
-  window.TomatenKlatsch = { Logic, Stats, Store, Game, UI };
+  window.TomatenKlatsch = { Logic, NumTasks, Stats, Store, Game, UI, Journey };
   if (/[?&]test\b/.test(location.search)) {
-    const r = Logic.selfTest();
+    const r1 = Logic.selfTest(), r2 = NumTasks.selfTest();
+    const r = { ok: r1.ok && r2.ok, fails: r1.fails.concat(r2.fails), checked: r1.checked + r2.checked };
     console.log('Selbsttest', r);
     const d = Util.el('div', '', `Selbsttest: ${r.ok ? '✅ OK' : '❌ ' + r.fails.length + ' Fehler'} (${r.checked} Prüfungen)`);
     d.id = 'testres'; document.getElementById('app').appendChild(d);
