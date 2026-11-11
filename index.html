@@ -399,6 +399,16 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .dg-msg{min-height:1.3em;font-size:clamp(16px,2.2vh,22px);font-weight:800;color:var(--gold)}
 .duel .dg-slot{--s:clamp(52px,8vh,84px)} .duel .dg-card{--s:clamp(48px,7.5vh,78px)}
 .dg-slot b{line-height:1.1}
+/* Hunderterfeld-Schatzsuche */
+.hg{width:100%;height:100%;display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.hg-c{display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,.08);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28);font-weight:900;font-size:clamp(14px,2.3vh,22px);color:#fff;cursor:pointer;min-height:0}
+.hg-c.known{background:rgba(255,255,255,.22);cursor:default;color:#fff}
+.hg-c.miss{background:rgba(255,106,61,.28);color:#ffd0c0;box-shadow:inset 0 0 0 1.5px rgba(255,106,61,.6)}
+.hg-c.hit{background:linear-gradient(#ffe36e,#ffad1f);color:#3a1206;box-shadow:0 0 18px rgba(255,213,74,.8)}
+.hg-c.show{background:rgba(157,255,122,.3);box-shadow:inset 0 0 0 2px #9dff7a}
+.g-grid .mz-badge{top:50%}
+.g-grid .mz-in{padding-top:6px;padding-bottom:6px}
 @media (orientation:landscape){
   .duel .dg{flex-direction:row;gap:clamp(16px,3vw,40px)} .duel .dg-msg{position:absolute;bottom:6px;left:0;right:0;text-align:center}
 }
@@ -2020,7 +2030,10 @@ const Mini = (() => {
     m.cur.done = true;
     award(side, m.n === 1 ? (m.cur.wrong[side] ? 1 : 2) : 1);   // allein: ohne Fehler 2 Punkte
     Sound.pluck();
-    m.dom.zones.forEach((_, s) => badge(s, s === side ? '⭐ Richtig!' : 'Zu spät!', s === side));
+    m.dom.zones.forEach((_, s) => {
+      if (m.def.reveal) m.def.reveal(m.cur.ctx[s], m.cur.r);
+      badge(s, s === side ? '⭐ Richtig!' : 'Zu spät!', s === side);
+    });
     later(nextRound, 1500);
     return true;
   }
@@ -2192,6 +2205,45 @@ const Mini = (() => {
         } else if (s && slots[+s.dataset.i] != null) { slots[+s.dataset.i] = null; Sound.tap(); draw(); }
       });
       return {};
+    },
+  };
+
+  /* ===== Spiel 3: Hunderterfeld-Schatzsuche ===== */
+  GAMES.grid = {
+    title: 'Hunderterfeld-Schatzsuche', group: 'hunderter', maxPoints: 2,
+    newRound(no, n) {
+      // allein ganzes Hunderterfeld, zu zweit ein Ausschnitt mit 5 Reihen (Felder bleiben groß genug zum Tippen)
+      const rows = n === 1 ? 10 : 5, first = R(0, 9) * 100 + (n === 1 ? 0 : R(0, 5) * 10) + 1;
+      const num = (r, c) => first + r * 10 + c, shown = new Set();
+      // Hilfszahlen: Runden 1–3 erste Spalte + Ecken, 4–7 nur die Ecken, 8–10 nur eine einzige Zahl
+      if (no <= 3) { for (let r = 0; r < rows; r++) shown.add(num(r, 0)); shown.add(num(0, 9)); shown.add(num(rows - 1, 9)); }
+      else if (no <= 7) [num(0, 0), num(0, 9), num(rows - 1, 0), num(rows - 1, 9)].forEach(x => shown.add(x));
+      else shown.add(num(R(0, rows - 1), R(0, 9)));
+      let target; do { target = num(R(0, rows - 1), R(0, 9)); } while (shown.has(target));
+      return { first, rows, shown, target, task: lbl('Finde das Feld', target) };
+    },
+    render(box, r, side) {
+      let html = `<div class="hg" style="grid-template-rows:repeat(${r.rows},1fr)">`;
+      for (let i = 0; i < r.rows * 10; i++) {
+        const n = r.first + i, known = r.shown.has(n);
+        html += `<div class="hg-c${known ? ' known' : ''}" data-n="${n}">${known ? n : ''}</div>`;
+      }
+      box.innerHTML = html + '</div>';
+      box.addEventListener('pointerdown', e => {
+        const c = e.target.closest('.hg-c');
+        if (!c || !api.canAnswer() || c.classList.contains('known') || c.classList.contains('miss')) return;
+        const n = +c.dataset.n;
+        if (n === r.target) { if (api.race(side, true)) { c.classList.add('hit'); c.textContent = n; } return; }
+        api.race(side, false);
+        c.classList.add('miss'); c.textContent = n;   // falsches Feld zeigt seine Zahl – hilft beim Weitersuchen
+        FX.shake(c);
+      });
+      return { box };
+    },
+    /** nach der Runde bei allen das gesuchte Feld zeigen */
+    reveal(ctx, r) {
+      const c = ctx.box.querySelector(`.hg-c[data-n="${r.target}"]`);
+      if (c && !c.classList.contains('hit')) { c.classList.add('show'); c.textContent = r.target; }
     },
   };
 
@@ -2533,6 +2585,8 @@ const UI = (() => {
     { action: 'minigame', game: 'digits', title: 'Ziffern-Duell', sub: 'Größte, kleinste Zahl legen',
       icon: () => '<svg viewBox="0 0 64 64">' + [[4, '7', -8], [23, '1', 0], [42, '5', 8]].map(([x, t, r]) =>
         `<g transform="rotate(${r} ${x + 9} 32)"><rect x="${x}" y="18" width="18" height="26" rx="4" fill="#fff"/><text x="${x + 9}" y="38" text-anchor="middle" font-size="18" font-weight="900" fill="#2a0b18">${t}</text></g>`).join('') + '</svg>' },
+    { action: 'minigame', game: 'grid', title: 'Hunderterfeld-Schatzsuche', sub: 'Finde das richtige Feld',
+      icon: () => '<svg viewBox="0 0 64 64">' + Array.from({ length: 25 }, (_, i) => `<rect x="${6 + (i % 5) * 11}" y="${6 + Math.floor(i / 5) * 11}" width="9" height="9" rx="2" fill="${i === 13 ? '#ffd54a' : 'rgba(255,255,255,.35)'}"/>`).join('') + '</svg>' },
   ];
   function startMini(game, players) {
     last = { mode: 'mini', game, players };
