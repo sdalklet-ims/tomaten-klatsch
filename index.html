@@ -382,6 +382,26 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .ln-target{font-size:20px;font-weight:900;fill:#ffd54a;font-family:var(--font);stroke:rgba(30,8,40,.8);stroke-width:4px;paint-order:stroke fill}
 .ln-hint{font-size:clamp(15px,2vh,19px);font-weight:800;color:var(--muted)}
 .res-max{font-size:.45em;color:var(--muted);align-self:flex-end;margin-bottom:.4em}
+/* Ziffern-Duell */
+.dg{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vh,20px)}
+.dg-slots{display:flex;gap:clamp(6px,1vw,12px)}
+.dg-slot{--s:clamp(64px,11vh,104px);width:var(--s);height:calc(var(--s) * 1.15);border-radius:16px;border:3px dashed rgba(255,255,255,.45);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,.06)}
+.dg-slot b{font-size:clamp(14px,2vh,20px);color:var(--gold)}
+.dg-slot span{font-size:clamp(36px,6.5vh,62px);font-weight:900;line-height:1}
+.dg-slot.full{border-style:solid;border-color:#fff;background:rgba(255,255,255,.16)}
+.dg.right .dg-slot{border-color:#9dff7a;background:rgba(157,255,122,.2)}
+.dg-cards{display:flex;gap:clamp(10px,1.6vw,18px)}
+.dg-card{--s:clamp(58px,10vh,96px);width:var(--s);height:calc(var(--s) * 1.2);border-radius:14px;background:#fff;color:#2a0b18;
+  font-size:clamp(36px,6.5vh,60px);font-weight:900;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 0 #b9c4d6,0 10px 22px rgba(0,0,0,.35);cursor:pointer;transition:transform .12s,opacity .2s}
+.dg-card.used{opacity:.18;transform:scale(.9)}
+.dg-msg{min-height:1.3em;font-size:clamp(16px,2.2vh,22px);font-weight:800;color:var(--gold)}
+.duel .dg-slot{--s:clamp(52px,8vh,84px)} .duel .dg-card{--s:clamp(48px,7.5vh,78px)}
+.dg-slot b{line-height:1.1}
+@media (orientation:landscape){
+  .duel .dg{flex-direction:row;gap:clamp(16px,3vw,40px)} .duel .dg-msg{position:absolute;bottom:6px;left:0;right:0;text-align:center}
+}
 
 /* Planeten-Reise */
 .card.wide{width:min(1000px,100%);flex-direction:row;justify-content:center;gap:clamp(14px,2.5vw,28px);padding:12px 24px}
@@ -2121,6 +2141,60 @@ const Mini = (() => {
     },
   };
 
+  /* ===== Spiel 2: Ziffern-Duell ===== */
+  GAMES.digits = {
+    title: 'Ziffern-Duell', group: 'ziffern', maxPoints: 2,
+    newRound(no) {
+      // 3 verschiedene Ziffern; ab Runde 5 manchmal mit 0 (darf nicht vorne stehen)
+      let d;
+      do { d = [R(1, 9), R(1, 9), no > 4 && Math.random() < .35 ? 0 : R(1, 9)]; } while (new Set(d).size < 3);
+      const perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]].map(p => p.map(i => d[i]))
+        .filter(x => x[0] !== 0).map(x => x[0] * 100 + x[1] * 10 + x[2]);
+      const goal = no <= 3 ? 'max' : no <= 6 ? 'min' : pick(['max', 'min', 'between', 'between']);
+      let ok, task;
+      if (goal === 'max') { const v = Math.max(...perms); ok = n => n === v; task = lbl('Lege die', 'größte Zahl'); }
+      else if (goal === 'min') { const v = Math.min(...perms); ok = n => n === v; task = lbl('Lege die', 'kleinste Zahl'); }
+      else { const h = pick(d.filter(x => x > 0)) * 100; ok = n => n > h && n < h + 100; task = lbl('Lege eine Zahl zwischen', `${h} und ${h + 100}`); }
+      return { digits: Logic.shuffle(d), ok, goal, task };
+    },
+    render(box, r, side) {
+      box.innerHTML = `<div class="dg">
+        <div class="dg-slots">${['H', 'Z', 'E'].map((l, i) => `<div class="dg-slot" data-i="${i}"><b>${l}</b><span></span></div>`).join('')}</div>
+        <div class="dg-cards">${r.digits.map((n, i) => `<div class="dg-card" data-i="${i}">${n}</div>`).join('')}</div>
+        <div class="dg-msg"></div></div>`;
+      const slots = [null, null, null], cards = [...box.querySelectorAll('.dg-card')], slotEls = [...box.querySelectorAll('.dg-slot')];
+      const msg = box.querySelector('.dg-msg');
+      let busy = false;
+      const draw = () => {
+        slotEls.forEach((s, i) => { s.querySelector('span').textContent = slots[i] == null ? '' : r.digits[slots[i]]; s.classList.toggle('full', slots[i] != null); });
+        cards.forEach((c, i) => c.classList.toggle('used', slots.includes(i)));
+      };
+      const check = () => {
+        const n = slots.reduce((s, ci) => s * 10 + r.digits[ci], 0);
+        if (r.digits[slots[0]] === 0) { fail('Eine Zahl fängt nicht mit 0 an!'); return; }
+        if (api.race(side, r.ok(n))) { box.classList.add('right'); msg.textContent = ''; return; }
+        fail(r.goal === 'max' ? 'Geht es noch größer?' : r.goal === 'min' ? 'Geht es noch kleiner?' : 'Schau auf die Hunderter!');
+      };
+      const fail = text => {
+        if (!api.canAnswer()) return;
+        if (r.digits[slots[0]] === 0) api.race(side, false);
+        busy = true; msg.textContent = text;
+        FX.shake(box.querySelector('.dg-slots'));
+        setTimeout(() => { slots.fill(null); draw(); busy = false; }, 700);
+      };
+      box.addEventListener('pointerdown', e => {
+        if (busy || !api.canAnswer()) return;
+        const c = e.target.closest('.dg-card'), s = e.target.closest('.dg-slot');
+        if (c && !slots.includes(+c.dataset.i)) {
+          const free = slots.indexOf(null); if (free < 0) return;
+          slots[free] = +c.dataset.i; Sound.tap(); FX.bump(slotEls[free], 1.12); draw();
+          if (!slots.includes(null)) check();
+        } else if (s && slots[+s.dataset.i] != null) { slots[+s.dataset.i] = null; Sound.tap(); draw(); }
+      });
+      return {};
+    },
+  };
+
   return { start, quit, pause, resume, GAMES, ROUNDS,
     get active() { return !!(m && !m.over); }, get n() { return m ? m.n : 1; }, get mode() { return m ? m.mode : 'solo'; } };
 })();
@@ -2456,6 +2530,9 @@ const UI = (() => {
   const MINI_CARDS = [
     { action: 'minigame', game: 'line', title: 'Zahlenstrahl-Landung', sub: 'Allein oder zu zweit',
       icon: () => '<svg viewBox="0 0 64 64"><path d="M6 44H58" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M10 38V50M22 40V48M32 36V52M42 40V48M54 38V50" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M38 34L32 22H44Z" fill="#ffd54a"/><path d="M38 22V8" stroke="#fff" stroke-width="2.5"/><circle cx="38" cy="7" r="5" fill="#3ee0ff"/></svg>' },
+    { action: 'minigame', game: 'digits', title: 'Ziffern-Duell', sub: 'Größte, kleinste Zahl legen',
+      icon: () => '<svg viewBox="0 0 64 64">' + [[4, '7', -8], [23, '1', 0], [42, '5', 8]].map(([x, t, r]) =>
+        `<g transform="rotate(${r} ${x + 9} 32)"><rect x="${x}" y="18" width="18" height="26" rx="4" fill="#fff"/><text x="${x + 9}" y="38" text-anchor="middle" font-size="18" font-weight="900" fill="#2a0b18">${t}</text></g>`).join('') + '</svg>' },
   ];
   function startMini(game, players) {
     last = { mode: 'mini', game, players };
