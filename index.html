@@ -440,6 +440,9 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .pbtn .lock{position:absolute;left:50%;top:50%;width:26%;translate:-50% -50%}
 .pbtn .flag{position:absolute;right:-6%;top:-22%;width:30%}
 .pl-stars{position:absolute;left:50%;top:100%;translate:-50% 0;display:flex;gap:2px;font-size:clamp(16px,2.4vmin,24px);line-height:1;margin-top:4px}
+.pl-name{position:absolute;left:50%;top:100%;translate:-50% 0;margin-top:clamp(22px,3.4vmin,32px);white-space:nowrap;
+  font-size:clamp(12px,1.6vmin,16px);font-weight:800;color:var(--muted);text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.card.mini .ico svg.plsvg+svg.plsvg{margin-left:-22px}
 .pl-stars i,.pr-stars i{font-style:normal;color:rgba(255,255,255,.22);display:inline-block}
 .pl-stars i.on,.pr-stars i.on{color:var(--gold);text-shadow:0 0 10px rgba(255,213,74,.8)}
 .rec-ring{position:absolute;inset:-14%;border-radius:50%;border:3px dashed var(--hurry);animation:spin 14s linear infinite}
@@ -955,59 +958,78 @@ const NumTasks = (() => {
   return { KINDS, GROUPS, groupOf, groupName, byKind, make, selfTest };
 })();
 
-/* ---------------- Journey: Planeten-Reise (Missionen, Sterne, Empfehlung) ---------------- */
+/* ---------------- Journey: Planeten-Reisen (Missionen, Sterne, Empfehlung) ----------------
+   Zwei Galaxien: 'mul' = Planeten-Reise (Einmaleins, Planet-ID = Reihe 2–10),
+   'z1000' = Zahlen-Galaxie (Planet-ID = Themengruppe aus NumTasks, z. B. 'nachbarn'). */
 const Journey = (() => {
-  // Lernreihenfolge: leichte Reihen zuerst, die 7er als großes Ziel am Ende (1er-Reihe bewusst nicht dabei)
-  const ROUTE = [10, 2, 5, 3, 4, 6, 9, 8, 7];
-  const FAST_MS = 3000, MISS_DAYS = 7;
-  const guest = { planets: {} };   // Gast: Fortschritt nur bis zum Neuladen
-  const prog = p => { const o = p || guest; if (!o.planets || typeof o.planets !== 'object') o.planets = {}; return o.planets; };
-  const stars = (p, row) => (prog(p)[row] || {}).stars || 0;
-  const unlocked = (p, row) => { const i = ROUTE.indexOf(row); return i <= 0 || stars(p, ROUTE[i - 1]) >= 1; };
-  const conqueredCount = p => ROUTE.filter(r => stars(p, r) >= 3).length;
-  const totalStars = p => ROUTE.reduce((s, r) => s + stars(p, r), 0);
+  const MISS_DAYS = 7;
+  const GAL = {
+    // Lernreihenfolge: leichte Reihen zuerst, die 7er als großes Ziel am Ende (1er-Reihe bewusst nicht dabei)
+    mul: { key: 'planets', title: 'Planeten-Reise', fast: 3000, route: [10, 2, 5, 3, 4, 6, 9, 8, 7] },
+    z1000: { key: 'planets2', title: 'Zahlen-Galaxie', fast: 6000,
+      route: ['nachbarn', 'vergleichen', 'zehner', 'stellen', 'folgen', 'strahl', 'hunderter'],
+      names: { nachbarn: 'Nachbarn-Planet', vergleichen: 'Vergleichs-Planet', zehner: 'Zehner-Planet', stellen: 'Stellentafel-Planet',
+        folgen: 'Folgen-Planet', strahl: 'Zahlenstrahl-Planet', hunderter: 'Hunderterfeld-Planet' } },
+  };
+  const galOf = id => typeof id === 'string' ? 'z1000' : 'mul';
+  const route = (gal = 'mul') => GAL[gal].route;
+  const name = id => galOf(id) === 'mul' ? `${id}er-Planet` : GAL.z1000.names[id];
+  const guest = {};   // Gast: Fortschritt nur bis zum Neuladen
+  const prog = (p, gal) => { const o = p || guest, k = GAL[gal].key; if (!o[k] || typeof o[k] !== 'object') o[k] = {}; return o[k]; };
+  const stars = (p, id) => (prog(p, galOf(id))[id] || {}).stars || 0;
+  const unlocked = (p, id) => { const R = route(galOf(id)), i = R.indexOf(id); return i <= 0 || stars(p, R[i - 1]) >= 1; };
+  const conqueredCount = (p, gal = 'mul') => route(gal).filter(r => stars(p, r) >= 3).length;
+  const totalStars = (p, gal = 'mul') => route(gal).reduce((s, r) => s + stars(p, r), 0);
+  /** Astronauten-Anzug: eroberte Planeten aus beiden Galaxien zusammen, höchstens 9 Teile */
+  const suitLevel = p => Math.min(9, conqueredCount(p, 'mul') + conqueredCount(p, 'z1000'));
   /** zuletzt besuchter Planet (für die Position der Figur) */
-  function lastRow(p) {
-    let best = ROUTE[0], t = -1;
-    for (const r of ROUTE) { const e = prog(p)[r]; if (e && e.last > t) { t = e.last; best = r; } }
+  function lastRow(p, gal = 'mul') {
+    const R = route(gal);
+    let best = R[0], t = -1;
+    for (const r of R) { const e = prog(p, gal)[r]; if (e && e.last > t) { t = e.last; best = r; } }
     return best;
   }
-  /** Mission: alle Aufgaben der Reihe (×2 … ×10, Richtung zufällig) + bis zu 2 Wiederholungen eroberter Planeten */
-  function mission(p, row) {
-    const tasks = Logic.shuffle([2, 3, 4, 5, 6, 7, 8, 9, 10]).map(k => Math.random() < .5 ? { a: row, b: k } : { a: k, b: row });
-    const won = Logic.shuffle(ROUTE.filter(r => r !== row && stars(p, r) >= 3));
+  /** Mission. Einmaleins: alle Aufgaben der Reihe (×2 … ×10) · Zahlen-Galaxie: 10 Aufgaben aus dem Thema, Arten abwechselnd.
+      Dazu bis zu 2 Wiederholungen von eroberten Planeten derselben Galaxie. */
+  function mission(p, id) {
+    const gal = galOf(id), R = route(gal), won = Logic.shuffle(R.filter(r => r !== id && stars(p, r) >= 3));
+    let tasks;
+    const kindsOf = gid => NumTasks.GROUPS.find(g => g.id === gid).kinds;
+    if (gal === 'mul') tasks = Logic.shuffle([2, 3, 4, 5, 6, 7, 8, 9, 10]).map(k => Math.random() < .5 ? { a: id, b: k } : { a: k, b: id });
+    else { const ks = kindsOf(id); let pool = []; tasks = Array.from({ length: 10 }, () => { if (!pool.length) pool = Logic.shuffle(ks); return { kind: pool.pop() }; }); }
     won.slice(0, 2).forEach(r => {
-      const k = 2 + Math.floor(Math.random() * 9);
-      tasks.splice(2 + Math.floor(Math.random() * (tasks.length - 2)), 0, Math.random() < .5 ? { a: r, b: k } : { a: k, b: r });
+      let t;
+      if (gal === 'mul') { const k = 2 + Math.floor(Math.random() * 9); t = Math.random() < .5 ? { a: r, b: k } : { a: k, b: r }; }
+      else { const ks = kindsOf(r); t = { kind: ks[Math.floor(Math.random() * ks.length)] }; }
+      tasks.splice(2 + Math.floor(Math.random() * (tasks.length - 2)), 0, t);
     });
     return tasks;
   }
-  /** 1 Stern: geschafft · 2: ohne Fehler · 3: ohne Fehler und jede Antwort ≤ 3 s */
-  const rate = ({ wrong, times }) => wrong ? 1 : times.every(ms => ms <= FAST_MS) ? 3 : 2;
-  function record(p, row, s) {
-    const e = prog(p)[row] || (prog(p)[row] = { stars: 0, visits: 0, last: 0 });
+  /** 1 Stern: geschafft · 2: ohne Fehler · 3: ohne Fehler und jede Antwort schnell genug (Einmaleins 3 s, Zahlen-Galaxie 6 s) */
+  const rate = ({ wrong, times }, id) => wrong ? 1 : times.every(ms => ms <= GAL[galOf(id)].fast) ? 3 : 2;
+  function record(p, id, s) {
+    const pr = prog(p, galOf(id)), e = pr[id] || (pr[id] = { stars: 0, visits: 0, last: 0 });
     const before = e.stars;
     e.stars = Math.max(e.stars, s); e.visits++; e.last = Date.now();
     if (p) Store.save();
     return { before, after: e.stars };
   }
-  /** Empfehlung: knifflige Reihe (Statistik) → lange nicht besuchter eroberter Planet → nächster auf der Route */
-  function recommend(p) {
-    const open = ROUTE.filter(r => unlocked(p, r));
-    const todo = open.filter(r => stars(p, r) < 3);
+  /** Empfehlung: knifflige Reihe bzw. kniffliges Thema (Statistik) → lange nicht besuchter eroberter Planet → nächster auf der Route */
+  function recommend(p, gal = 'mul') {
+    const R = route(gal), open = R.filter(r => unlocked(p, r)), todo = open.filter(r => stars(p, r) < 3);
+    const lastOf = r => (prog(p, gal)[r] || {}).last || 0;
     if (p) {
-      const rows = Stats.rows(p);
-      const tricky = todo.map(r => rows[r - 1]).filter(x => x.enough && x.score >= .25).sort((a, b) => b.score - a.score)[0];
+      const rows = gal === 'mul' ? Stats.rows(p) : Stats.rowsZ(p);
+      const tricky = todo.map(r => rows.find(x => x.row === r)).filter(x => x && x.enough && x.score >= .25).sort((a, b) => b.score - a.score)[0];
       if (tricky) return { row: tricky.row, reason: 'tricky' };
-      const old = ROUTE.filter(r => stars(p, r) >= 3 && Date.now() - prog(p)[r].last > MISS_DAYS * 864e5)
-        .sort((a, b) => prog(p)[a].last - prog(p)[b].last)[0];
+      const old = R.filter(r => stars(p, r) >= 3 && Date.now() - lastOf(r) > MISS_DAYS * 864e5).sort((a, b) => lastOf(a) - lastOf(b))[0];
       if (old) return { row: old, reason: 'missing' };
     }
     if (todo.length) return { row: todo[0], reason: 'next' };
-    const lastOf = r => (prog(p)[r] || {}).last || 0;
-    return { row: ROUTE.slice().sort((a, b) => lastOf(a) - lastOf(b))[0], reason: 'done' };
+    return { row: R.slice().sort((a, b) => lastOf(a) - lastOf(b))[0], reason: 'done' };
   }
-  return { ROUTE, FAST_MS, stars, unlocked, conqueredCount, totalStars, lastRow, mission, rate, record, recommend };
+  return { GAL, galOf, route, name, stars, unlocked, conqueredCount, totalStars, suitLevel, lastRow, mission, rate, record, recommend,
+    get ROUTE() { return GAL.mul.route; } };
 })();
 
 /* ---------------- Sound: synthetische Effekte mit Web Audio ---------------- */
@@ -1372,7 +1394,7 @@ const Art = (() => {
     return `<svg class="figsvg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}${ACCESSORY[f.id] || ''}${suitTop(suit, f)}</svg>`;
   }
   /** Figur eines Profils mit seinem Anzug (Gast: ohne Anzug, außer suit wird übergeben) */
-  const figureOf = (p, suit) => figureSVG(p ? p.fig : null, suit != null ? suit : p ? Journey.conqueredCount(p) : 0);
+  const figureOf = (p, suit) => figureSVG(p ? p.fig : null, suit != null ? suit : p ? Journey.suitLevel(p) : 0);
   /* ----- Planeten für die Planeten-Reise: jede Reihe ein eigener Planet ----- */
   const PLANETS = {
     2: { c: ['#c4f1ff', '#4cc3ff', '#1b5fa8'], deco: 'craters' },
@@ -1384,6 +1406,14 @@ const Art = (() => {
     8: { c: ['#ffd6cf', '#ff5a4a', '#9c1f16'], deco: 'craters' },
     9: { c: ['#cefff6', '#3fd6c0', '#137a6c'], deco: 'spots', ring: '#c9fff6' },
     10: { c: ['#fff7c9', '#ffd23f', '#c98a00'], deco: 'sun' },
+    // Zahlen-Galaxie: Themen-Planeten mit Symbol statt Zahl
+    nachbarn: { c: ['#d0f0ff', '#38b6ff', '#14569e'], deco: 'craters', label: '±1' },
+    vergleichen: { c: ['#ffe0f0', '#ff5fa8', '#9e1f5e'], deco: 'bands', label: '<>' },
+    zehner: { c: ['#fff0c4', '#ffb020', '#a85d00'], deco: 'spots', label: '+10' },
+    stellen: { c: ['#e6ffd8', '#62d64a', '#23771a'], deco: 'craters', label: 'HZE' },
+    folgen: { c: ['#efe3ff', '#9c7bff', '#4b2fb0'], deco: 'bands', label: '…', ring: '#e3d6ff' },
+    strahl: { c: ['#ffd9cf', '#ff6a4d', '#a31f10'], deco: 'spots', label: '→' },
+    hunderter: { c: ['#d3fff6', '#33d1b8', '#0f7466'], deco: 'grid', label: '', ring: '#ffd27a' },
   };
   function planetSVG(row) {
     const p = PLANETS[row], id = 'pg' + row;
@@ -1402,10 +1432,13 @@ const Art = (() => {
       s += `<path d="M5 ${y}Q30 ${y - 6} 50 ${y}T95 ${y}" stroke="${p.c[0]}" stroke-width="${w}" fill="none" opacity=".35"/>`;
     if (p.deco === 'spots') for (const [x, y, r] of [[34, 58, 9], [64, 34, 7], [66, 66, 5], [42, 32, 4]])
       s += `<circle cx="${x}" cy="${y}" r="${r}" fill="${p.c[0]}" opacity=".35"/>`;
+    if (p.deco === 'grid') for (let i = 0; i < 25; i++)
+      s += `<rect x="${24 + (i % 5) * 11}" y="${24 + Math.floor(i / 5) * 11}" width="9" height="9" rx="2" fill="${i === 12 ? '#ffd54a' : p.c[0]}" opacity="${i === 12 ? 1 : .45}"/>`;
     s += `</g><ellipse cx="34" cy="30" rx="11" ry="6" transform="rotate(-30 34 30)" fill="#fff" opacity=".35"/>`;
     if (p.ring) s += `<path d="M-8 50A60 14 0 0 0 108 50" fill="none" stroke="${p.ring}" stroke-width="5" opacity=".9" transform="rotate(-16 50 50)"/>`;
-    s += `<text class="plnum" x="50" y="50" dy=".35em" text-anchor="middle" font-size="${row === 10 ? 34 : 42}">${row}</text></svg>`;
-    return s;
+    const text = p.label != null ? p.label : String(row), fs = typeof row === 'number' ? (row === 10 ? 34 : 42) : text.length <= 2 ? 38 : 28;
+    if (text) s += `<text class="plnum" x="50" y="50" dy=".35em" text-anchor="middle" font-size="${fs}">${Util.esc(text)}</text>`;
+    return s + '</svg>';
   }
   return { VARIETIES, FIGURES, SUIT_NAMES, figure, figureSVG, figureOf, installDefs, tomatoSVG, basketSVG, sliceSVG, iconSVG, planetSVG };
 })();
@@ -1511,7 +1544,7 @@ const Game = (() => {
       scr.classList.add('solo');   // gleiches Layout wie Solo
       const row = g.plan.row;
       scr.innerHTML = `
-        <div class="bar solo-top"><div class="l planet-badge">${Art.planetSVG(row)}<span>${row}er-Planet</span></div>${taskHTML(false)}
+        <div class="bar solo-top"><div class="l planet-badge">${Art.planetSVG(row)}<span>${Journey.name(row)}</span></div>${taskHTML(false)}
           <div class="r">Aufgabe&nbsp;<span class="rnd">1</span>/<span class="tot">${g.plan.total}</span></div></div>
         <div class="field"></div>
         <div class="bar"><div class="l"></div><div class="solo-mid">${whoHTML('solo', 0)}${basketHTML('solo', '#ffd54a', 0)}</div><div class="r"></div></div>`;
@@ -1714,10 +1747,12 @@ const Game = (() => {
     Pwa.wake(false);
     let res;
     if (g.mode === 'planet') {
-      const P = g.plan, prof = g.prof[0], s = Journey.rate({ wrong: P.wrong, times: P.times });
+      const P = g.plan, prof = g.prof[0], gal = Journey.galOf(P.row), s = Journey.rate({ wrong: P.wrong, times: P.times }, P.row);
+      const suitBefore = Journey.suitLevel(prof);
       const { before, after } = Journey.record(prof, P.row, s);
-      res = { mode: 'planet', players: g.prof, row: P.row, stars: s, before, after, wrongTasks: P.wrongTasks,
-        allConquered: before < 3 && after >= 3 && Journey.conqueredCount(prof) === Journey.ROUTE.length };
+      res = { mode: 'planet', gal, players: g.prof, row: P.row, stars: s, before, after, wrongTasks: P.wrongTasks,
+        newSuit: Journey.suitLevel(prof) > suitBefore ? Journey.suitLevel(prof) : 0,
+        allConquered: before < 3 && after >= 3 && Journey.conqueredCount(prof, gal) === Journey.route(gal).length };
     } else if (g.mode === 'solo') {
       // Rekord nur mit Profil, getrennt nach Thema
       const p1 = g.players[0], prof = g.prof[0], bk = g.topic === 'z1000' ? 'bestZ' : 'best';
@@ -2370,7 +2405,7 @@ const UI = (() => {
     const prof = id === 'guest' ? null : Store.get(id);
     if (pick.mini && pick.n === 1) return startMini(pick.mini, [prof]);
     if (pick.mode === 'solo') return startGame('solo', [prof]);
-    if (pick.mode === 'planet') return openMap(prof);
+    if (pick.mode === 'planet') return openMap(prof, pick.gal || 'mul');
     if (id !== 'guest' && pick.sel.some((s, i) => i !== slot && s === id)) return; // jedes Profil nur einmal
     pick.sel[slot] = pick.sel[slot] === id ? undefined : id;                     // nochmal tippen = abwählen
     updatePick();
@@ -2459,52 +2494,61 @@ const UI = (() => {
     if (from === 'pick' && pick) { renderPick(); go('pick'); } else go('profiles');
   }
 
-  /* ----- Planeten-Reise: Sternenkarte ----- */
-  // Positionen (in % der Kartenfläche) entlang der Route: Schlangenlinie von oben links bis zum 7er-Planeten unten rechts
-  const MAP_POS = [[14, 22], [42, 15], [74, 22], [86, 52], [57, 57], [28, 50], [13, 82], [43, 86], [76, 80]];
+  /* ----- Planeten-Reisen: Sternenkarte (Planeten-Reise und Zahlen-Galaxie) ----- */
+  // Positionen (in % der Kartenfläche) entlang der Route, Schlangenlinie bis zum großen Ziel-Planeten
+  const MAP_POS = {
+    mul: [[14, 22], [42, 15], [74, 22], [86, 52], [57, 57], [28, 50], [13, 82], [43, 86], [76, 80]],
+    z1000: [[14, 22], [45, 15], [78, 22], [84, 54], [52, 58], [20, 56], [50, 84]],
+  };
+  const BIG = { mul: 7, z1000: 'hunderter' };   // großes Ziel am Ende der Route
   const FLAG = '<svg class="flag" viewBox="0 0 30 40"><path d="M4 38V4" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M5 5L26 11L5 18Z" fill="#ffd54a" stroke="#c98a00" stroke-width="1.5" stroke-linejoin="round"/></svg>';
   const LOCK = '<svg class="lock" viewBox="0 0 24 28"><path d="M6 13V8a6 6 0 0 1 12 0v5" fill="none" stroke="#fff" stroke-width="3"/><rect x="3" y="12" width="18" height="14" rx="3" fill="#fff"/></svg>';
   const genitive = name => /[sßxz]$/i.test(name) ? name + '’' : name + 's';   // „Lenas“, „Max’“
-  let journeyProf = null;   // Profil der laufenden Reise (null = Gast)
-  function openMap(prof) { journeyProf = prof; renderMap(); go('map'); }
+  let journeyProf = null, journeyGal = 'mul';   // Profil (null = Gast) und Galaxie der laufenden Reise
+  function openMap(prof, gal = journeyGal) { journeyProf = prof; journeyGal = gal; renderMap(); go('map'); }
+  const dat = id => Journey.name(id) + 'en';   // „dem/den 7er-Planeten“
   function recText(rec, p) {
-    const r = rec.row, st = Journey.stars(p, r);
-    let t = rec.reason === 'tricky' ? `Heute empfohlen: der ${r}er-Planet. Da wird es noch knifflig!`
-      : rec.reason === 'missing' ? `Der ${r}er-Planet vermisst dich! Schau mal wieder vorbei.`
-      : rec.reason === 'done' ? `Alle Planeten erobert! Halte sie frisch und besuch den ${r}er-Planeten.`
-      : st ? `Hol dir den nächsten Stern auf dem ${r}er-Planeten!` : `Auf zum ${r}er-Planeten!`;
+    const r = rec.row, n = Journey.name(r), st = Journey.stars(p, r);
+    let t = rec.reason === 'tricky' ? `Heute empfohlen: der ${n}. Da wird es noch knifflig!`
+      : rec.reason === 'missing' ? `Der ${n} vermisst dich! Schau mal wieder vorbei.`
+      : rec.reason === 'done' ? `Alle Planeten erobert! Halte sie frisch und besuch den ${dat(r)}.`
+      : st ? `Hol dir den nächsten Stern auf dem ${dat(r)}!` : `Auf zum ${dat(r)}!`;
     if (!p) t += ' Als Gast wird die Reise nicht gespeichert.';
     return t;
   }
   function renderMap() {
-    const p = journeyProf, R = Journey.ROUTE, rec = Journey.recommend(p), here = R.indexOf(Journey.lastRow(p));
-    const won = Journey.conqueredCount(p);
+    const p = journeyProf, gal = journeyGal, R = Journey.route(gal), POS = MAP_POS[gal], z = gal === 'z1000';
+    const rec = Journey.recommend(p, gal), here = R.indexOf(Journey.lastRow(p, gal));
+    const won = Journey.conqueredCount(p, gal), suit = Journey.suitLevel(p);
     const reachedIdx = R.reduce((m, r, i) => Journey.unlocked(p, r) ? i : m, 0);
-    const line = n => MAP_POS.slice(0, n).map(xy => xy.join(',')).join(' ');
+    const line = n => POS.slice(0, n).map(xy => xy.join(',')).join(' ');
     const planets = R.map((row, i) => {
       const st = Journey.stars(p, row), open = Journey.unlocked(p, row);
-      const cls = ['pbtn', open ? '' : 'locked', st >= 3 ? 'won' : '', row === rec.row ? 'rec' : '', row === 7 ? 'big' : ''].join(' ');
-      return `<button class="${cls}" data-action="planet" data-row="${row}" style="left:${MAP_POS[i][0]}%;top:${MAP_POS[i][1]}%"
-          aria-label="${row}er-Planet, ${st} von 3 Sternen${open ? '' : ', noch gesperrt'}">
+      const cls = ['pbtn', open ? '' : 'locked', st >= 3 ? 'won' : '', row === rec.row ? 'rec' : '', row === BIG[gal] ? 'big' : ''].join(' ');
+      return `<button class="${cls}" data-action="planet" data-row="${row}" style="left:${POS[i][0]}%;top:${POS[i][1]}%"
+          aria-label="${Journey.name(row)}, ${st} von 3 Sternen${open ? '' : ', noch gesperrt'}">
         ${row === rec.row ? '<span class="rec-ring"></span><span class="rec-tag">Heute empfohlen</span>' : ''}
         ${Art.planetSVG(row)}${st >= 3 ? FLAG : ''}${open ? '' : LOCK}
-        <span class="pl-stars">${[1, 2, 3].map(k => `<i class="${k <= st ? 'on' : ''}">★</i>`).join('')}</span></button>`;
+        <span class="pl-stars">${[1, 2, 3].map(k => `<i class="${k <= st ? 'on' : ''}">★</i>`).join('')}</span>
+        ${z ? `<span class="pl-name">${NumTasks.groupName(row)}</span>` : ''}</button>`;
     }).join('');
+    const title = z ? 'Zahlen-Galaxie' : 'Sternenkarte', champ = z ? '🏅 Zahlen-Kommandant · ' : '🏅 Einmaleins-Astronaut · ';
+    S.map.classList.toggle('zgal', z);
     S.map.innerHTML = `<div class="map-head"><button class="btn ghost" data-action="menu">‹ Zurück</button>
-        <h2>${p ? esc(genitive(p.name)) : 'Deine'} Sternenkarte</h2>
-        <span class="map-prog">${won === R.length ? '🏅 Einmaleins-Astronaut · ' : ''}${won} von ${R.length} erobert · ${Journey.totalStars(p)} ★</span></div>
+        <h2>${p ? esc(genitive(p.name)) : 'Deine'} ${title}</h2>
+        <span class="map-prog">${won === R.length ? champ : ''}${won} von ${R.length} erobert · ${Journey.totalStars(p, gal)} ★</span></div>
       <div class="map-area">
         <svg class="route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           <polyline points="${line(R.length)}" class="r-all"/><polyline points="${line(reachedIdx + 1)}" class="r-done"/></svg>
         ${planets}
-        <div class="map-fig" style="left:${MAP_POS[here][0]}%;top:${MAP_POS[here][1]}%">${Art.figureOf(p, Journey.conqueredCount(p))}</div>
+        <div class="map-fig" style="left:${POS[here][0]}%;top:${POS[here][1]}%">${Art.figureOf(p, suit)}</div>
       </div>
-      <div class="tip map-tip">${Art.figureOf(p, won)}<div class="tip-col"><span id="map-msg">${recText(rec, p)}</span>
-        ${won < R.length ? `<span class="suit-next">🧑‍🚀 Nächstes Anzug-Teil: ${Art.SUIT_NAMES[won]} (Anzug ${won}/${R.length})</span>`
+      <div class="tip map-tip">${Art.figureOf(p, suit)}<div class="tip-col"><span id="map-msg">${recText(rec, p)}</span>
+        ${suit < 9 ? `<span class="suit-next">🧑‍🚀 Nächstes Anzug-Teil: ${Art.SUIT_NAMES[suit]} (Anzug ${suit}/9 · zählt in beiden Reisen)</span>`
           : '<span class="suit-next">🧑‍🚀 Dein Astronauten-Anzug ist komplett!</span>'}</div></div>`;
   }
   function startMission(row) {
-    last = { mode: 'planet', players: [journeyProf], row };
+    last = { mode: 'planet', players: [journeyProf], row, gal: journeyGal };
     go('game');
     Game.start('planet', [journeyProf], { row, tasks: Journey.mission(journeyProf, row) });
   }
@@ -2531,17 +2575,19 @@ const UI = (() => {
     el.classList.remove('duelres', 'many');
     const conquered = res.before < 3 && res.after >= 3;
     const head = s === 3 ? withName('Blitzschnell', p) + '!' : s === 2 ? withName('Ohne Fehler', p) + '!' : withName('Mission geschafft', p) + '!';
-    const line = res.allConquered ? 'Alle Planeten erobert! Du bist jetzt Einmaleins-Astronaut! 🏅'
-      : conquered ? `Der ${row}er-Planet ist erobert! 🚩`
+    const fast = Journey.GAL[res.gal].fast / 1000;
+    const line = res.allConquered ? (res.gal === 'z1000' ? 'Die ganze Zahlen-Galaxie ist erobert! Du bist jetzt Zahlen-Kommandant! 🏅'
+        : 'Alle Planeten erobert! Du bist jetzt Einmaleins-Astronaut! 🏅')
+      : conquered ? `Der ${Journey.name(row)} ist erobert! 🚩`
       : s === 1 ? 'Für den 2. Stern: die Mission ohne Fehler schaffen.'
-      : s === 2 ? 'Für den 3. Stern: ohne Fehler und jede Antwort in unter 3 Sekunden.'
+      : s === 2 ? `Für den 3. Stern: ohne Fehler und jede Antwort in unter ${fast} Sekunden.`
       : 'Wieder alle 3 Sterne. Stark!';
     const newStar = res.after > res.before && !conquered ? `<p class="res-line rec">Neuer Stern! Jetzt ${res.after} von 3.</p>`
-      : conquered ? `<p class="res-line suit-new">🧑‍🚀 Neues Anzug-Teil: ${Art.SUIT_NAMES[Journey.conqueredCount(p) - 1]}!</p>` : '';
-    const hard = res.wrongTasks.length ? `<p class="res-line">Knifflig waren: ${res.wrongTasks.slice(0, 4).join(' · ')}</p>` : '';
+      : res.newSuit ? `<p class="res-line suit-new">🧑‍🚀 Neues Anzug-Teil: ${Art.SUIT_NAMES[res.newSuit - 1]}!</p>` : '';
+    const hard = res.wrongTasks.length ? `<p class="res-line">Knifflig waren: ${res.wrongTasks.slice(0, 4).map(esc).join(' · ')}</p>` : '';
     el.innerHTML = `<div class="res-solo planet-res">
       <p class="res-big">${head}</p>
-      <div class="pr-row"><span class="res-fig ${s === 3 || conquered ? 'winner' : ''}">${Art.figureOf(p, Journey.conqueredCount(p))}</span>${Art.planetSVG(row)}</div>
+      <div class="pr-row"><span class="res-fig ${s === 3 || conquered ? 'winner' : ''}">${Art.figureOf(p, Journey.suitLevel(p))}</span>${Art.planetSVG(row)}</div>
       <div class="pr-stars">${[1, 2, 3].map(() => '<i>★</i>').join('')}</div>
       <p class="res-line ${res.after >= 3 ? 'rec' : ''}">${line}</p>${newStar}${hard}
       <div class="menu-row"><button class="btn big" data-action="again">Nochmal</button><button class="btn ghost" data-action="tomap">Zur Sternenkarte</button></div></div>`;
@@ -2580,6 +2626,8 @@ const UI = (() => {
   }
   /** Zusatz-Karten im Thema „Zahlen bis 1000“ (die Spiele selbst kommen aus Mini) */
   const MINI_CARDS = [
+    { action: 'journey', title: 'Zahlen-Galaxie', sub: 'Alle Themen erobern',
+      icon: () => ['nachbarn', 'vergleichen'].map(r => Art.planetSVG(r)).join('') },
     { action: 'minigame', game: 'line', title: 'Zahlenstrahl-Landung', sub: 'Allein oder zu zweit',
       icon: () => '<svg viewBox="0 0 64 64"><path d="M6 44H58" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M10 38V50M22 40V48M32 36V52M42 40V48M54 38V50" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M38 34L32 22H44Z" fill="#ffd54a"/><path d="M38 22V8" stroke="#fff" stroke-width="2.5"/><circle cx="38" cy="7" r="5" fill="#3ee0ff"/></svg>' },
     { action: 'minigame', game: 'digits', title: 'Ziffern-Duell', sub: 'Größte, kleinste Zahl legen',
@@ -2600,19 +2648,19 @@ const UI = (() => {
     trio() { openPick('trio'); },
     quad() { openPick('quad'); },
     again() {
-      if (last.mode === 'planet') { const p0 = last.players[0]; journeyProf = p0 ? Store.get(p0.id) : null; return startMission(last.row); }
+      if (last.mode === 'planet') { const p0 = last.players[0]; journeyProf = p0 ? Store.get(p0.id) : null; journeyGal = last.gal || 'mul'; return startMission(last.row); }
       if (last.mode === 'mini') return startMini(last.game, last.players.map(p => p && Store.get(p.id)));
       startGame(last.mode, last.players.map(p => p && Store.get(p.id)), last.topic);   // gelöschtes Profil → Gast
     },
-    journey() { openPick('planet'); },
+    journey() { openPick('planet'); pick.gal = isZ() ? 'z1000' : 'mul'; renderPick(); },
     topic(b) { Store.data.topic = b.dataset.topic === 'z1000' ? 'z1000' : 'mul'; Store.save(); renderMenu(); },
     tomap() { renderMap(); go('map'); },
     planet(b) {
-      const row = +b.dataset.row;
+      const row = /^\d+$/.test(b.dataset.row) ? +b.dataset.row : b.dataset.row;   // Reihe (Zahl) oder Thema (Name)
       if (!Journey.unlocked(journeyProf, row)) {
-        const prev = Journey.ROUTE[Journey.ROUTE.indexOf(row) - 1];
+        const R = Journey.route(Journey.galOf(row)), prev = R[R.indexOf(row) - 1];
         FX.shake(b);
-        document.getElementById('map-msg').textContent = `Der ${row}er-Planet wird frei, sobald du auf dem ${prev}er-Planeten einen Stern hast.`;
+        document.getElementById('map-msg').textContent = `Der ${Journey.name(row)} wird frei, sobald du auf dem ${dat(prev)} einen Stern hast.`;
         return;
       }
       startMission(row);
