@@ -363,6 +363,26 @@ h1.title{margin:0;font-size:clamp(32px,10.5vw,96px);font-weight:900;letter-spaci
 .res-fig svg{width:clamp(90px,15vmin,140px);height:auto;overflow:visible}
 .res-fig.winner svg,.winner .who svg{animation:winhop .7s ease-in-out infinite alternate}
 .res-half .who svg{width:clamp(56px,9vh,84px);height:clamp(56px,9vh,84px)}
+/* Zusatz-Spiele (Mini): ein Feld pro Spieler, oben gedreht */
+.mini .task{background:rgba(20,8,50,.55);border-radius:999px;box-shadow:0 0 0 3px rgba(255,255,255,.15) inset;min-width:clamp(180px,22vw,280px)}
+.mzone{position:absolute;touch-action:none;border-radius:16px}
+.mz-in{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:10px 16px}
+.multi .mz-in{padding-left:72px;padding-right:72px}
+.mzone.p1{background:linear-gradient(to top,rgba(62,224,255,.04),rgba(62,224,255,.16));box-shadow:inset 0 0 0 2px rgba(62,224,255,.35)}
+.mzone.p2{background:linear-gradient(to top,rgba(255,122,192,.04),rgba(255,122,192,.16));box-shadow:inset 0 0 0 2px rgba(255,122,192,.35)}
+.solo .mzone.p1{background:none;box-shadow:none}
+.mz-badge{position:absolute;left:50%;top:50%;padding:10px 22px;border-radius:999px;font-weight:900;font-size:clamp(22px,3.4vh,34px);
+  white-space:nowrap;pointer-events:none;z-index:3;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.mz-badge.good{background:linear-gradient(#ffe36e,#ffad1f);color:#3a1206}
+.mz-badge.bad{background:rgba(30,12,60,.85);color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.3) inset}
+.g-line .mz-badge{top:22%}
+.ln{width:100%;display:flex;flex-direction:column;align-items:center;gap:4px}
+.ln-svg{width:100%;height:auto;overflow:visible}
+.ln-lab{font-size:20px;font-weight:900;fill:#fff;font-family:var(--font)}
+.ln-target{font-size:20px;font-weight:900;fill:#ffd54a;font-family:var(--font);stroke:rgba(30,8,40,.8);stroke-width:4px;paint-order:stroke fill}
+.ln-hint{font-size:clamp(15px,2vh,19px);font-weight:800;color:var(--muted)}
+.res-max{font-size:.45em;color:var(--muted);align-self:flex-end;margin-bottom:.4em}
+
 /* Planeten-Reise */
 .card.wide{width:min(1000px,100%);flex-direction:row;justify-content:center;gap:clamp(14px,2.5vw,28px);padding:12px 24px}
 .card.wide .ico{height:clamp(64px,10vmin,96px);align-items:center}
@@ -1866,6 +1886,245 @@ const Game = (() => {
     get active() { return !!(g && !g.over); }, get mode() { return g ? g.mode : 'solo'; } };
 })();
 
+/* ---------------- Mini: Zusatz-Spiele „Zahlen bis 1000“ (Zahlenstrahl-Landung, Ziffern-Duell, Hunderterfeld) ----------------
+   Gemeinsames Gerüst: Leisten mit Figur/Korb/Aufgabe, ein Feld (Zone) pro Spieler – im Duell oben um 180° gedreht –,
+   Countdown, 10 Runden, Punkte. Jedes Spiel liefert nur newRound() und render(); Antworten laufen über
+   race() (wer zuerst richtig ist) oder submit() + resolve() (alle geben eine Schätzung ab, die beste gewinnt). */
+const Mini = (() => {
+  const scr = document.getElementById('scr-game');
+  const ROUNDS = 10;
+  const R = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  let m = null, mid = 0;
+  const later = (fn, ms) => { const id = mid; setTimeout(() => { if (m && m.id === id && !m.over) fn(); }, ms); };
+  const GAMES = {};
+
+  /* ----- Rahmen ----- */
+  function buildFrame() {
+    const mode = m.mode, slots = Game.SLOTS[mode];
+    const who = i => `<div class="who" data-p="${i}">${Art.figureOf(m.prof[i])}<span class="nm">${Util.esc(UI.displayName(m.prof[i], i, mode))}</span></div>`;
+    const basket = (cls, color, i) => `<div class="basket ${cls}" data-p="${i}"><div class="halo"></div>${Art.basketSVG(color)}<div class="score">0</div></div>`;
+    const task = '<div class="task"><div class="task-text rich"></div></div>';
+    const rnd = `<div class="r">Runde&nbsp;<span class="rnd">1</span>/${ROUNDS}</div>`;
+    scr.classList.remove('solo', 'duel', 'trio', 'quad', 'multi', 'planet');
+    scr.classList.add('mini', mode === 'solo' ? 'solo' : 'multi', mode, 'g-' + m.gameId);
+    const zones = slots.map((s, i) => `<div class="mzone p${i + 1}" data-side="${i}" style="left:${s.x * 100}%;top:${s.y * 100}%;width:${s.w * 100}%;height:${s.h * 100}%;${s.rot ? 'transform:rotate(180deg);' : ''}"></div>`).join('');
+    if (mode === 'solo') {
+      scr.innerHTML = `<div class="bar solo-top"><div class="l"></div>${task}${rnd}</div>
+        <div class="field mfield">${zones}</div>
+        <div class="bar"><div class="l"></div><div class="solo-mid">${who(0)}${basket('solo', '#ffd54a', 0)}</div><div class="r"></div></div>`;
+    } else {
+      const bar = top => `<div class="bar multi ${top ? 'top' : ''}">${Game.slotsInHalf(mode, top).map(s =>
+        `<div class="seg" style="width:${s.w * 100}%"><div class="l">${who(s.i)}${basket('p' + (s.i + 1), Game.COLORS[s.i], s.i)}</div>${task}${rnd}</div>`).join('')}</div>`;
+      scr.innerHTML = `${bar(true)}<div class="field mfield">${zones}</div>${bar(false)}`;
+    }
+    scr.insertAdjacentHTML('beforeend', '<button class="btn-exit" data-action="quit" aria-label="Spiel beenden">✕</button><div class="overlay" id="cdl"></div>');
+    m.dom = { zones: [...scr.querySelectorAll('.mzone')], texts: [...scr.querySelectorAll('.task-text')], rounds: [...scr.querySelectorAll('.rnd')],
+      baskets: slots.map((_, i) => scr.querySelector(`.basket[data-p="${i}"]`)), cdl: scr.querySelector('#cdl') };
+    m.dom.zones.forEach(z => z.addEventListener('pointerdown', e => e.preventDefault(), { passive: false }));
+  }
+  function countdown(done) {
+    ['3', '2', '1', 'Los!'].forEach((txt, i) => later(() => {
+      m.dom.cdl.innerHTML = '';
+      Sound.count(i === 3);
+      m.dom.zones.forEach((z, side) => {
+        const r = z.getBoundingClientRect(), d = Util.el('div', 'cdm');
+        d.style.left = r.left + r.width / 2 + 'px'; d.style.top = r.top + r.height / 2 + 'px';
+        d.style.transform = `translate(-50%,-50%) rotate(${Game.SLOTS[m.mode][side].rot}deg)`;
+        d.innerHTML = `<span>${txt}</span>`;
+        m.dom.cdl.appendChild(d);
+        FX.anim(d.firstChild, [{ transform: 'scale(.2)', opacity: 0 }, { transform: 'scale(1.1)', opacity: 1, offset: .3 },
+          { transform: 'scale(1)', opacity: 1, offset: .7 }, { transform: 'scale(1.3)', opacity: 0 }], { duration: 640, fill: 'forwards' });
+      });
+      if (i === 3) later(() => { m.dom.cdl.innerHTML = ''; done(); }, 450);
+    }, i * 620));
+  }
+
+  /* ----- Ablauf ----- */
+  function start(gameId, profiles) {
+    mid++;
+    if (m) m.over = true;
+    FX.clear();
+    const mode = profiles.length > 1 ? 'duel' : 'solo', slots = Game.SLOTS[mode];
+    m = { id: mid, gameId, def: GAMES[gameId], mode, n: slots.length, round: 0, over: false, paused: false, running: false,
+      prof: slots.map((_, i) => profiles[i] || null), players: slots.map(() => ({ score: 0 })), cur: null };
+    buildFrame();
+    Pwa.wake(true);
+    countdown(() => { m.running = true; nextRound(); });
+  }
+  function nextRound() {
+    if (!m.running) return;
+    if (m.round >= ROUNDS) return finish();
+    m.round++;
+    const r = m.def.newRound(m.round, m.n);
+    m.cur = { r, done: false, t0: performance.now(), wrong: {}, subs: {}, ctx: [] };
+    for (const t of m.dom.texts) {
+      t.innerHTML = r.task;
+      FX.anim(t, Util.reducedMotion ? [{ opacity: 0 }, { opacity: 1 }] :
+        [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1.12)', opacity: 1, offset: .6 }, { transform: 'scale(1)', opacity: 1 }], { duration: 420 });
+    }
+    for (const el of m.dom.rounds) el.textContent = m.round;
+    m.dom.zones.forEach((z, side) => {
+      // pro Runde ein frisches Innenfeld: Tipp-Empfänger der alten Runde verschwinden damit mit
+      z.classList.remove('won', 'lost');
+      z.innerHTML = '<div class="mz-in"></div>';
+      m.cur.ctx[side] = m.def.render(z.firstChild, r, side, api);
+    });
+  }
+  const canAnswer = () => m && m.running && !m.paused && !m.cur.done;
+  function award(side, pts) {
+    if (!pts) return;
+    const P = m.players[side], b = m.dom.baskets[side];
+    P.score += pts;
+    const sc = b.querySelector('.score'); sc.textContent = P.score;
+    FX.bump(sc, 1.45); FX.hop(b.querySelector('.bimg'));
+    const w = scr.querySelector(`.who[data-p="${side}"] svg`); if (w) FX.hop(w);
+    const br = b.querySelector('.bimg').getBoundingClientRect();
+    FX.burst(br.left + br.width / 2, br.top + br.height / 2, Util.reducedMotion ? 2 : 10, '#fff7c0');
+    Sound.land();
+  }
+  function badge(side, text, good) {
+    const z = m.dom.zones[side];
+    z.classList.add(good ? 'won' : 'lost');
+    const b = Util.el('div', 'mz-badge ' + (good ? 'good' : 'bad'), text);
+    z.appendChild(b);
+    FX.anim(b, [{ transform: 'translate(-50%,-50%) scale(.3)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 1, offset: .6 },
+      { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }], { duration: 380, fill: 'forwards' });
+  }
+  /** Spieler seite antwortet; ok = richtig? Bei „wer zuerst“: erster richtiger gewinnt die Runde. */
+  function race(side, ok) {
+    if (!canAnswer()) return false;
+    const ms = performance.now() - m.cur.t0;
+    Stats.recordZ(m.prof[side], m.def.group, ok, ok ? ms : 0);
+    if (!ok) { m.cur.wrong[side] = true; Sound.splat(); return false; }
+    m.cur.done = true;
+    award(side, m.n === 1 ? (m.cur.wrong[side] ? 1 : 2) : 1);   // allein: ohne Fehler 2 Punkte
+    Sound.pluck();
+    m.dom.zones.forEach((_, s) => badge(s, s === side ? '⭐ Richtig!' : 'Zu spät!', s === side));
+    later(nextRound, 1500);
+    return true;
+  }
+  /** Schätz-Spiele: jede Seite gibt einmal eine Antwort ab; danach (oder 6 s nach der ersten) wird ausgewertet. */
+  function submit(side, value) {
+    if (!canAnswer() || m.cur.subs[side]) return false;
+    m.cur.subs[side] = { value, ms: performance.now() - m.cur.t0 };
+    Sound.tap();
+    if (Object.keys(m.cur.subs).length === m.n) later(resolve, 350);
+    else if (!m.cur.timer) { m.cur.timer = true; const r = m.cur; later(() => { if (m.cur === r) resolve(); }, 6000); }
+    return true;
+  }
+  function resolve() {
+    if (m.cur.done) return;
+    m.cur.done = true;
+    const out = m.def.resolve(m.cur.r, m.cur.subs, m.cur.ctx, m.n);
+    out.forEach(o => {
+      if (m.cur.subs[o.side]) Stats.recordZ(m.prof[o.side], m.def.group, o.correct, o.correct ? m.cur.subs[o.side].ms : 0);
+      award(o.side, o.points);
+      badge(o.side, o.text, o.points > 0);
+    });
+    Sound[out.some(o => o.points >= 2) ? 'pluck' : 'plop']();
+    later(nextRound, 2600);
+  }
+  function finish() {
+    m.running = false; m.over = true;
+    Pwa.wake(false);
+    const def = m.def, scores = m.players.map(p => p.score);
+    let res;
+    if (m.n === 1) {
+      const prof = m.prof[0], prev = prof ? (prof.mini[m.gameId] || 0) : 0, newBest = !!prof && scores[0] > prev;
+      if (newBest) { prof.mini[m.gameId] = scores[0]; Store.save(); }
+      res = { mode: 'mini', game: m.gameId, title: def.title, players: m.prof, score: scores[0], max: ROUNDS * def.maxPoints,
+        best: Math.max(prev, scores[0]), newBest };
+    } else res = { mode: 'duel', mini: m.gameId, unit: 'Punkte', players: m.prof, scores };
+    UI.showResult(res);
+  }
+  function quit() { if (m) { m.over = true; m.running = false; } Pwa.wake(false); }
+  function pause() { if (m && !m.over && !m.paused) m.paused = true; }
+  function resume() { if (m) m.paused = false; }
+  const api = { race, submit, canAnswer: () => canAnswer(), get mode() { return m.mode; } };
+
+  /* ----- Hilfen ----- */
+  /** x-Position (0..1) eines Fingers innerhalb eines Elements; gedrehte Zonen werden zurückgespiegelt */
+  function localX(e, el, side) {
+    const r = el.getBoundingClientRect(), fx = (e.clientX - r.left) / r.width;
+    return Game.SLOTS[m.mode][side].rot ? 1 - fx : fx;
+  }
+  const lbl = (small, big) => `<div class="t-lbl">${small}</div><div class="t-big">${big}</div>`;
+
+  /* ===== Spiel 1: Zahlenstrahl-Landung ===== */
+  GAMES.line = {
+    title: 'Zahlenstrahl-Landung', group: 'strahl', maxPoints: 3,
+    newRound(no) {
+      // Runden 1–3: 0–1000 (Zehnerzahlen) · 4–7: ein Hunderter-Ausschnitt · 8–10: 0–1000 mit beliebigen Zahlen (schätzen)
+      if (no <= 3) return mk(0, 1000, R(2, 98) * 10, 10, [10, 40, 100], 100);
+      if (no <= 7) { const lo = R(0, 9) * 100; let t; do { t = lo + R(1, 99); } while (t % 10 === 0 && Math.random() < .7); return mk(lo, lo + 100, t, 1, [1, 3, 8], 10); }
+      let t; do { t = R(11, 989); } while (t % 10 === 0); return mk(0, 1000, t, 10, [8, 25, 70], 100);
+      function mk(lo, hi, target, tick, tol, labelEvery) {
+        return { lo, hi, target, tick, tol, labelEvery, task: lbl('Lande bei', target) };
+      }
+    },
+    render(zone, r, side) {
+      zone.innerHTML = '<div class="ln"><svg class="ln-svg"></svg><div class="ln-hint">Tippe auf den Zahlenstrahl!</div></div>';
+      const svg = zone.querySelector('svg'), W = Math.max(300, zone.offsetWidth), H = 150, x0 = 34, x1 = W - 34, y = 92;
+      const X = n => x0 + (n - r.lo) / (r.hi - r.lo) * (x1 - x0);
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      let s = `<path d="M${x0 - 14} ${y}H${x1 + 14}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`;
+      for (let n = r.lo; n <= r.hi; n += r.tick) {
+        const major = (n - r.lo) % r.labelEvery === 0, half = !major && (n - r.lo) % (r.labelEvery / 2) === 0;
+        s += `<path d="M${X(n).toFixed(1)} ${y - (major ? 16 : half ? 11 : 7)}V${y + (major ? 16 : half ? 11 : 7)}" stroke="#fff" stroke-width="${major ? 3 : half ? 2 : 1.3}" opacity="${major ? 1 : .75}"/>`;
+        if (major) s += `<text x="${X(n).toFixed(1)}" y="${y + 40}" text-anchor="middle" class="ln-lab">${n}</text>`;
+      }
+      svg.innerHTML = s + '<g class="ln-marks"></g>';
+      const ctx = { X, W, svg, marks: svg.querySelector('.ln-marks') };
+      zone.addEventListener('pointerdown', e => {
+        if (!api.canAnswer()) return;
+        const fx = localX(e, svg, side) * W;
+        const v = Math.round(Util.clamp(r.lo + (fx - x0) / (x1 - x0) * (r.hi - r.lo), r.lo, r.hi));
+        if (!api.submit(side, v)) return;
+        ctx.mine = v;
+        zone.querySelector('.ln-hint').textContent = 'Gelandet! Mal sehen …';
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.innerHTML = `<g transform="translate(${X(v).toFixed(1)} ${y - 4})"><path d="M0 0L-10 -18H10Z" fill="${Game.COLORS[side]}" stroke="#fff" stroke-width="2"/>
+          <path d="M0 -18V-44" stroke="#fff" stroke-width="3"/><circle cx="0" cy="-50" r="8" fill="${Game.COLORS[side]}" stroke="#fff" stroke-width="2"/></g>`;
+        ctx.marks.appendChild(g);
+        FX.anim(g, [{ transform: 'translateY(-70px)', opacity: 0 }, { transform: 'translateY(4px)', opacity: 1, offset: .8 }, { transform: 'translateY(0)', opacity: 1 }],
+          { duration: 420, easing: 'ease-out' });
+      });
+      return ctx;
+    },
+    /** Auswertung: allein Punkte nach Genauigkeit, im Duell gewinnt der nähere Treffer (Punktlandung doppelt) */
+    resolve(r, subs, ctxs, n) {
+      const dist = side => subs[side] ? Math.abs(subs[side].value - r.target) : Infinity;
+      ctxs.forEach(ctx => {   // richtige Stelle mit Stern zeigen
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.innerHTML = `<g transform="translate(${ctx.X(r.target).toFixed(1)} 92)"><circle r="13" fill="#ffd54a" opacity=".35"/>
+          <path d="M0 -11L3.2 -3.4L11 -3.4L4.8 1.6L7 9.5L0 4.8L-7 9.5L-4.8 1.6L-11 -3.4L-3.2 -3.4Z" fill="#ffd54a" stroke="#c98a00" stroke-width="1.2"/>
+          <text y="-24" text-anchor="middle" class="ln-target">${r.target}</text></g>`;
+        ctx.marks.appendChild(g);
+      });
+      const best = Math.min(...ctxs.map((_, s) => dist(s)));
+      return ctxs.map((_, side) => {
+        const d = dist(side), [t0, t1, t2] = r.tol;
+        const exact = d <= t0, near = d <= t1;
+        let points, text;
+        if (d === Infinity) { points = 0; text = 'Zu spät!'; }
+        else if (n === 1) {
+          points = exact ? 3 : near ? 2 : d <= t2 ? 1 : 0;
+          text = exact ? '🎯 Punktlandung!' : near ? `Ganz nah! (${d} daneben)` : d <= t2 ? `Gut geschätzt (${d} daneben)` : `${d} daneben`;
+        } else {
+          const win = d === best;
+          points = win ? (exact ? 2 : 1) : 0;
+          text = win ? (exact ? '🎯 Punktlandung!' : `Näher dran! (${d} daneben)`) : `${d} daneben`;
+        }
+        return { side, points, correct: near, text };
+      });
+    },
+  };
+
+  return { start, quit, pause, resume, GAMES, ROUNDS,
+    get active() { return !!(m && !m.over); }, get n() { return m ? m.n : 1; }, get mode() { return m ? m.mode : 'solo'; } };
+})();
+
 /* ---------------- UI: Zustandsautomat für Bildschirme ---------------- */
 const UI = (() => {
   const S = {};
@@ -1921,13 +2180,16 @@ const UI = (() => {
     modal.classList.add('open');
   }
   const dialogOpen = () => modal.classList.contains('open');
+  /** laufende Spiel-Engine: Tomaten-Spiel oder Zusatz-Spiel */
+  const engine = () => Mini.active ? Mini : Game;
   function pauseDialog(title, text) {
-    if (!Game.active || dialogOpen()) return;
-    Game.pause();
+    const E = engine();
+    if (!E.active || dialogOpen()) return;
+    E.pause();
     dialog(title, text, [
-      { label: 'Weiterspielen', fn: () => Game.resume() },
-      { label: 'Beenden', cls: 'danger', fn: () => { const back = Game.mode === 'planet' ? 'map' : 'menu'; Game.quit(); if (back === 'map') renderMap(); go(back); } }],
-      Game.SLOTS[Game.mode].length > 1);
+      { label: 'Weiterspielen', fn: () => E.resume() },
+      { label: 'Beenden', cls: 'danger', fn: () => { const back = E === Game && Game.mode === 'planet' ? 'map' : 'menu'; E.quit(); if (back === 'map') renderMap(); go(back); } }],
+      E === Mini ? Mini.n > 1 : Game.SLOTS[Game.mode].length > 1);
   }
 
   /* ----- Profil-Karte (Figur + Name) ----- */
@@ -1936,7 +2198,8 @@ const UI = (() => {
 
   /* ----- „Wer spielt?“ ----- */
   let pick = null; // { mode, n, sel: [id | 'guest' | undefined, …] (Index = Platz) }
-  function openPick(mode) { pick = { mode, n: Game.SLOTS[mode].length, sel: [] }; renderPick(); go('pick'); }
+  /** mini: Zusatz-Spiel ('line' | 'digits' | 'grid'), sonst Tomaten-Spiel bzw. Reise */
+  function openPick(mode, mini = null) { pick = { mode, mini, n: Game.SLOTS[mode].length, sel: [] }; renderPick(); go('pick'); }
   const pickTitle = (slot) => pick.sel[slot] ? 'Bereit! Warte auf die anderen …' : 'Wer sitzt hier?';
   function renderPick() {
     const el = S.pick, profs = Store.profiles;
@@ -1979,6 +2242,7 @@ const UI = (() => {
   }
   function pickProfile(id, slot) {
     const prof = id === 'guest' ? null : Store.get(id);
+    if (pick.mini && pick.n === 1) return startMini(pick.mini, [prof]);
     if (pick.mode === 'solo') return startGame('solo', [prof]);
     if (pick.mode === 'planet') return openMap(prof);
     if (id !== 'guest' && pick.sel.some((s, i) => i !== slot && s === id)) return; // jedes Profil nur einmal
@@ -1989,7 +2253,8 @@ const UI = (() => {
       const chosen = pick.sel.slice(0, pick.n).join('|');
       setTimeout(() => {
         if (current !== 'pick' || !pick || !all() || pick.sel.slice(0, pick.n).join('|') !== chosen) return;
-        startGame(pick.mode, pick.sel.slice(0, pick.n).map(i => i === 'guest' ? null : Store.get(i)));
+        const players = pick.sel.slice(0, pick.n).map(i => i === 'guest' ? null : Store.get(i));
+        if (pick.mini) startMini(pick.mini, players); else startGame(pick.mode, players);
       }, 800);
     }
   }
@@ -2117,6 +2382,24 @@ const UI = (() => {
     go('game');
     Game.start('planet', [journeyProf], { row, tasks: Journey.mission(journeyProf, row) });
   }
+  /** Ergebnis eines Zusatz-Spiels allein: Punkte, Rekord, Lob nach Anteil der möglichen Punkte */
+  function showMiniResult(res) {
+    const el = S.result, p = res.players[0], q = res.max ? res.score / res.max : 0;
+    el.classList.remove('duelres', 'many');
+    const head = q >= .85 ? withName('Spitze', p) + '!' : q >= .6 ? withName('Super gemacht', p) + '!'
+      : q >= .3 ? withName('Gut gemacht', p) + '!' : withName('Weiter üben', p) + ', du schaffst das!';
+    const rec = !p ? 'Als Gast gespielt. Mit eigenem Profil merkt sich das Spiel deinen Rekord.'
+      : res.newBest ? 'Neuer Rekord! 🎉' : 'Dein Rekord: ' + res.best + ' Punkte';
+    el.innerHTML = `<div class="res-solo">
+      <p class="res-line">${esc(res.title)}</p>
+      <p class="res-big">${head}</p>
+      <div class="res-count"><span class="res-fig ${res.newBest ? 'winner' : ''}">${Art.figureOf(p)}</span><span class="cnt">${res.score}</span><span class="res-max">/ ${res.max}</span></div>
+      <p class="res-line ${res.newBest ? 'rec' : ''}">${rec}</p>
+      <div class="menu-row"><button class="btn big" data-action="again">Nochmal</button><button class="btn ghost" data-action="menu">Zum Menü</button></div></div>`;
+    go('result');
+    Sound.jingle();
+    if (q >= .6) FX.confetti('rain');
+  }
   function showPlanetResult(res) {
     const el = S.result, p = res.players[0], s = res.stars, row = res.row;
     el.classList.remove('duelres', 'many');
@@ -2170,7 +2453,15 @@ const UI = (() => {
     }
   }
   /** Zusatz-Karten im Thema „Zahlen bis 1000“ (die Spiele selbst kommen aus Mini) */
-  const MINI_CARDS = [];
+  const MINI_CARDS = [
+    { action: 'minigame', game: 'line', title: 'Zahlenstrahl-Landung', sub: 'Allein oder zu zweit',
+      icon: () => '<svg viewBox="0 0 64 64"><path d="M6 44H58" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M10 38V50M22 40V48M32 36V52M42 40V48M54 38V50" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M38 34L32 22H44Z" fill="#ffd54a"/><path d="M38 22V8" stroke="#fff" stroke-width="2.5"/><circle cx="38" cy="7" r="5" fill="#3ee0ff"/></svg>' },
+  ];
+  function startMini(game, players) {
+    last = { mode: 'mini', game, players };
+    go('game');
+    Mini.start(game, players);
+  }
   const actions = {
     start() { Sound.unlock(); go('menu'); },
     solo() { openPick('solo'); },
@@ -2179,6 +2470,7 @@ const UI = (() => {
     quad() { openPick('quad'); },
     again() {
       if (last.mode === 'planet') { const p0 = last.players[0]; journeyProf = p0 ? Store.get(p0.id) : null; return startMission(last.row); }
+      if (last.mode === 'mini') return startMini(last.game, last.players.map(p => p && Store.get(p.id)));
       startGame(last.mode, last.players.map(p => p && Store.get(p.id)), last.topic);   // gelöschtes Profil → Gast
     },
     journey() { openPick('planet'); },
@@ -2194,7 +2486,14 @@ const UI = (() => {
       }
       startMission(row);
     },
-    menu() { if (current === 'game') Game.quit(); FX.clear(); go('menu'); },
+    menu() { if (current === 'game') { Game.quit(); Mini.quit(); } FX.clear(); go('menu'); },
+    minigame(b) {
+      const game = b.dataset.game, def = Mini.GAMES[game];
+      dialog(def.title, 'Wie viele spielen mit?', [
+        { label: 'Allein', fn: () => openPick('solo', game) },
+        { label: 'Zu zweit', fn: () => openPick('duel', game) },
+        { label: 'Abbrechen', cls: 'ghost' }]);
+    },
     stats() { go('stats'); },
     profiles() { go('profiles'); },
     mute() { Store.data.muted = !Store.data.muted; Store.save(); Sound.setMuted(Store.data.muted); updateMute(); },
@@ -2238,6 +2537,7 @@ const UI = (() => {
   /* ----- Ergebnis ----- */
   function showResult(res) {
     if (res.mode === 'planet') return showPlanetResult(res);
+    if (res.mode === 'mini') return showMiniResult(res);
     const el = S.result;
     if (res.mode === 'solo') {
       el.classList.remove('duelres');
@@ -2274,7 +2574,8 @@ const UI = (() => {
         let sub;
         if (n === 2) {
           const o = 1 - i;
-          sub = shared ? `Ihr habt beide ${mine} Tomaten!` : `${esc(displayName(res.players[o], o, res.mode))} hat ${res.scores[o]} Tomaten`;
+          const unit = res.unit || 'Tomaten';
+          sub = shared ? `Ihr habt beide ${mine} ${unit}!` : `${esc(displayName(res.players[o], o, res.mode))} hat ${res.scores[o]} ${unit}`;
         } else sub = `Platz ${rank} von ${n}`;
         return `<div class="res-panel" style="width:${s.w * 100}%">
           <p class="head">${head}</p>
